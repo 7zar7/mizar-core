@@ -52,13 +52,14 @@ export function GlassCard({
           opacity: active ? 1 : 0,
           transition: "opacity 300ms ease-out",
           border: "1px solid transparent",
-          background: `radial-gradient(220px circle at ${pos.x}% ${pos.y}%, rgba(0,102,204,0.18), transparent 70%) border-box`,
+          background: `radial-gradient(220px circle at ${pos.x}% ${pos.y}%, rgba(196,30,14,0.20), transparent 70%) border-box`,
           WebkitMask:
             "linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0)",
           WebkitMaskComposite: "xor",
           maskComposite: "exclude",
         }}
       />
+      <span aria-hidden className="noise rounded-[inherit]" />
       <div className="relative z-[1]">{children}</div>
     </div>
   );

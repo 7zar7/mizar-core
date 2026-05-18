@@ -12,7 +12,7 @@
   --text-primary: #1a1a1e;
   --text-secondary: #6e6e73;
   --text-muted: #aeaeb2;
-  --accent: #0066cc;
+  --accent: #c41e0e;
   --accent-warm: #1a1a1e;
   --mono: #3a3a3c;
 
@@ -117,6 +117,20 @@ body {
     transition: transform 0.45s ease;
   }
 
+  .btn-deploy {
+    border-color: #1a1a1e;
+    transition:
+      border-color 0.25s ease,
+      box-shadow 0.25s ease;
+  }
+
+  .btn-deploy:hover {
+    border-color: #c41e0e;
+    box-shadow:
+      0 0 0 1px #c41e0e,
+      0 0 18px rgba(196, 30, 14, 0.45);
+  }
+
   .btn-ghost {
     background: transparent;
     color: var(--text-secondary);
@@ -172,6 +186,49 @@ body {
   }
   .will-anim {
     will-change: transform, opacity, filter;
+  }
+  .noise {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.02;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  body {
+    cursor: none;
+  }
+  body a,
+  body button,
+  body input,
+  body [data-cursor] {
+    cursor: none;
+  }
+}
+
+@keyframes drift-a {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+  50% {
+    transform: translateY(-26px) translateX(6px);
+  }
+  100% {
+    transform: translateY(0) translateX(0);
+  }
+}
+
+@keyframes drift-b {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+  50% {
+    transform: translateY(22px) translateX(-6px);
+  }
+  100% {
+    transform: translateY(0) translateX(0);
   }
 }
 

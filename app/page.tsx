@@ -1,5 +1,6 @@
 import { SiteProvider } from "@/components/SiteProvider";
 import { LaserSystem } from "@/components/LaserSystem";
+import { Cursor } from "@/components/Cursor";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { Manifesto } from "@/components/screens/Manifesto";
@@ -12,6 +13,7 @@ export default function Home() {
   return (
     <SiteProvider>
       <span id="top" />
+      <Cursor />
       <Nav />
       <LaserSystem />
       <main className="relative">

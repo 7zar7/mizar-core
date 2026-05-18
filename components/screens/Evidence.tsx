@@ -6,65 +6,236 @@ import {
   useTransform,
   type MotionValue,
 } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useSite } from "../SiteProvider";
 import { GlassCard } from "../GlassCard";
+import { SectionTag } from "../SectionTag";
 
 type CaseStudy = {
   n: string;
+  kind: "live" | "nda";
   industry: string;
   company: string;
   metric: string;
   metricLabel: string;
   desc: string;
-  tags: string[];
-  footer: string;
+  tags: [string, string];
   link?: string;
 };
 
 const CASES: CaseStudy[] = [
   {
     n: "01",
-    industry: "COMPETITIVE INTELLIGENCE",
-    company: "MATCH GROUP",
-    metric: "$12.85M",
-    metricLabel: "expansion opportunity identified",
-    desc: "Full 10-K analysis across 9-brand portfolio. 4 actionable growth vectors. Presented to internal stakeholders. Scope anonymized per NDA.",
-    tags: ["DATING TECH", "COMPETITIVE INTEL", "C-SUITE DELIVERY"],
-    footer: "Strategic deliverable · Scope anonymized per NDA",
-  },
-  {
-    n: "02",
-    industry: "AD MONETIZATION",
-    company: "SPARK",
-    metric: "$3.48M",
-    metricLabel: "annual revenue model",
-    desc: "Zero to full ad infrastructure strategy. CPM modelling, 3-phase rollout, GDPR compliance. Approved by C-suite panel.",
-    tags: ["LGBTQ+ TECH", "AD REVENUE", "GDPR COMPLIANT"],
-    footer: "Strategic deliverable · Scope anonymized per NDA",
-  },
-  {
-    n: "03",
-    industry: "MARKET RESEARCH",
-    company: "PERSONAL STYLING CO.",
-    metric: "$1.46B",
-    metricLabel: "market sized bottom-up",
-    desc: "Verified revenue analysis of Stitch Fix and competitors. Diagnosed 14–35× conversion gap. CEO + 2 directors approved.",
-    tags: ["CONSUMER FASHION", "MARKET SIZING", "EXEC APPROVED"],
-    footer: "Strategic deliverable · Scope anonymized per NDA",
-  },
-  {
-    n: "04",
+    kind: "live",
     industry: "LOCAL BUSINESS",
     company: "MENSLAB BCN",
     metric: "3 days",
     metricLabel: "from brief to live site",
-    desc: "End-to-end: design, copy, booking system, SEO. Barcelona premium barbershop. Named client.",
-    tags: ["LIVE SITE", "BARCELONA", "NAMED CLIENT"],
-    footer: "Live engagement · Named client",
+    desc: "End-to-end build: design, copy, booking, SEO. Barcelona barbershop, live in 3 days.",
+    tags: ["LIVE SITE", "BARCELONA"],
     link: "menslab-barbershop-wedq.vercel.app",
   },
+  {
+    n: "02",
+    kind: "live",
+    industry: "LIFESTYLE EDITORIAL",
+    company: "MILAN DECODED",
+    metric: "200 copies",
+    metricLabel: "sold at launch · PDF guide",
+    desc: "Brand, editorial copy and conversion site. Launched at €29, PDF delivered instantly.",
+    tags: ["LIVE SITE", "EDITORIAL"],
+    link: "milan-decoded.vercel.app",
+  },
+  {
+    n: "03",
+    kind: "nda",
+    industry: "COMPETITIVE INTELLIGENCE",
+    company: "MATCH GROUP",
+    metric: "$12.85M",
+    metricLabel: "expansion opportunity identified",
+    desc: "10-K analysis across a 9-brand portfolio. 4 growth vectors, presented to stakeholders.",
+    tags: ["COMPETITIVE INTEL", "C-SUITE"],
+  },
+  {
+    n: "04",
+    kind: "nda",
+    industry: "AD MONETIZATION",
+    company: "SPARK",
+    metric: "$3.48M",
+    metricLabel: "annual revenue model",
+    desc: "Ad infrastructure strategy from zero. CPM model, 3-phase rollout, C-suite approved.",
+    tags: ["AD REVENUE", "GDPR"],
+  },
+  {
+    n: "05",
+    kind: "nda",
+    industry: "MARKET RESEARCH",
+    company: "PERSONAL STYLING CO.",
+    metric: "$1.46B",
+    metricLabel: "market sized bottom-up",
+    desc: "Bottom-up sizing vs Stitch Fix. Diagnosed a 14–35× conversion gap, exec-approved.",
+    tags: ["MARKET SIZING", "EXEC APPROVED"],
+  },
 ];
+
+const shot = (url: string) =>
+  `https://s.wordpress.com/mshots/v1/${encodeURIComponent(
+    `https://${url}`,
+  )}?w=1000`;
+
+function DarkMetric({ metric }: { metric: string }) {
+  return (
+    <div
+      className="flex h-full w-full flex-col items-center justify-center"
+      style={{ background: "#1a1a1e" }}
+    >
+      <p
+        className="mono"
+        style={{
+          fontSize: 10,
+          letterSpacing: "0.22em",
+          color: "rgba(255,255,255,0.35)",
+          fontStyle: "italic",
+          padding: "0 24px",
+          textAlign: "center",
+          marginBottom: 14,
+        }}
+      >
+        Strategy delivered as standalone engagements. Same thinking goes
+        into every site we build.
+      </p>
+      <div
+        className="mono"
+        style={{
+          fontSize: 48,
+          fontWeight: 700,
+          color: "#c41e0e",
+          letterSpacing: "-0.02em",
+        }}
+      >
+        {metric}
+      </div>
+    </div>
+  );
+}
+
+function LiveShot({ url, metric }: { url: string; metric: string }) {
+  const [err, setErr] = useState(false);
+  if (err) return <DarkMetric metric={metric} />;
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={shot(url)}
+      alt=""
+      loading="lazy"
+      onError={() => setErr(true)}
+      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+    />
+  );
+}
+
+function CardBody({ c }: { c: CaseStudy }) {
+  return (
+    <div style={{ padding: 28 }}>
+      <div className="flex flex-wrap gap-2">
+        {c.tags.map((t) => (
+          <span
+            key={t}
+            className="mono"
+            style={{
+              fontSize: 10,
+              letterSpacing: "0.12em",
+              color: "var(--text-secondary)",
+              border: "1px solid var(--border)",
+              borderRadius: 999,
+              padding: "5px 12px",
+            }}
+          >
+            {t}
+          </span>
+        ))}
+      </div>
+      <p
+        className="mono"
+        style={{
+          fontSize: 22,
+          fontWeight: 700,
+          letterSpacing: "0.02em",
+          color: "var(--text-primary)",
+          marginTop: 16,
+        }}
+      >
+        {c.company}
+      </p>
+      <div
+        className="mono"
+        style={{
+          fontSize: "clamp(40px,5vw,68px)",
+          fontWeight: 700,
+          color: "var(--accent)",
+          lineHeight: 1,
+          letterSpacing: "-0.02em",
+          marginTop: 10,
+        }}
+      >
+        {c.metric}
+      </div>
+      <p
+        style={{
+          color: "var(--text-secondary)",
+          fontSize: 14,
+          marginTop: 6,
+        }}
+      >
+        {c.metricLabel}
+      </p>
+      <p
+        style={{
+          color: "var(--text-primary)",
+          fontSize: 15,
+          lineHeight: 1.55,
+          marginTop: 14,
+          maxWidth: "46ch",
+        }}
+      >
+        {c.desc}
+      </p>
+      {c.link && (
+        <span
+          className="mono"
+          style={{
+            display: "inline-block",
+            fontSize: 12,
+            color: "var(--accent)",
+            borderBottom: "1px solid var(--accent)",
+            paddingBottom: 2,
+            marginTop: 16,
+          }}
+        >
+          {c.link} ↗
+        </span>
+      )}
+    </div>
+  );
+}
+
+function CardInner({ c }: { c: CaseStudy }) {
+  return (
+    <GlassCard
+      className="max-h-full w-full overflow-hidden rounded-[6px]"
+      style={{ padding: 0 }}
+    >
+      <div style={{ height: 220, width: "100%" }}>
+        {c.kind === "live" && c.link ? (
+          <LiveShot url={c.link} metric={c.metric} />
+        ) : (
+          <DarkMetric metric={c.metric} />
+        )}
+      </div>
+      <CardBody c={c} />
+    </GlassCard>
+  );
+}
 
 function Panel({
   c,
@@ -87,119 +258,26 @@ function Panel({
   const scale = useTransform(progress, pts, [1, 1.02, 1], { clamp: true });
 
   return (
-    <div className="flex h-screen w-screen flex-shrink-0 items-center justify-center px-[6vw]">
+    <div className="flex h-full w-screen flex-shrink-0 items-center justify-center px-[6vw]">
       <motion.div
-        className="will-anim w-full"
-        style={{ filter, opacity, scale }}
+        className="will-anim flex max-h-full"
+        style={{ filter, opacity, scale, width: "min(640px, 80vw)" }}
+        whileHover={{ y: -4 }}
+        transition={{ type: "spring", stiffness: 220, damping: 22 }}
       >
-        <GlassCard
-          className="rounded-[6px]"
-          style={{ padding: "clamp(32px,5vw,72px)" }}
-        >
-          <div className="grid grid-cols-1 gap-10 md:grid-cols-[34%_1fr] md:gap-16">
-            <div className="relative">
-              <div
-                className="mono leading-none"
-                style={{
-                  fontSize: "clamp(80px,9vw,128px)",
-                  fontWeight: 900,
-                  color: "rgba(0,0,0,0.06)",
-                }}
-              >
-                {c.n}
-              </div>
-              <div className="mt-6 space-y-2">
-                <p className="label-mono">{c.industry}</p>
-                <p
-                  className="mono"
-                  style={{
-                    fontSize: 22,
-                    fontWeight: 700,
-                    color: "var(--text-primary)",
-                    letterSpacing: "0.02em",
-                  }}
-                >
-                  {c.company}
-                </p>
-              </div>
-            </div>
-
-            <div>
-              <div
-                className="mono"
-                style={{
-                  fontSize: "clamp(48px,6vw,84px)",
-                  fontWeight: 700,
-                  color: "var(--accent)",
-                  lineHeight: 1,
-                  letterSpacing: "-0.02em",
-                }}
-              >
-                {c.metric}
-              </div>
-              <p
-                className="mt-2"
-                style={{ color: "var(--text-secondary)", fontSize: 15 }}
-              >
-                {c.metricLabel}
-              </p>
-
-              <p
-                className="mt-7 max-w-[46ch]"
-                style={{
-                  color: "var(--text-primary)",
-                  fontSize: 17,
-                  lineHeight: 1.6,
-                }}
-              >
-                {c.desc}
-              </p>
-
-              {c.link && (
-                <a
-                  href={`https://${c.link}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mono mt-5 inline-block"
-                  style={{
-                    fontSize: 12,
-                    color: "var(--accent)",
-                    borderBottom: "1px solid var(--accent)",
-                    paddingBottom: 2,
-                  }}
-                >
-                  {c.link} ↗
-                </a>
-              )}
-
-              <div className="mt-8 flex flex-wrap gap-2">
-                {c.tags.map((t) => (
-                  <span
-                    key={t}
-                    className="mono"
-                    style={{
-                      fontSize: 10,
-                      letterSpacing: "0.12em",
-                      color: "var(--text-secondary)",
-                      border: "1px solid var(--border)",
-                      borderRadius: 999,
-                      padding: "5px 12px",
-                    }}
-                  >
-                    {t}
-                  </span>
-                ))}
-              </div>
-
-              <p
-                className="mono mt-8"
-                style={{ fontSize: 11, color: "var(--text-muted)" }}
-              >
-                {c.footer}
-              </p>
-            </div>
-          </div>
-        </GlassCard>
+        {c.kind === "live" && c.link ? (
+          <a
+            href={`https://${c.link}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-full"
+            data-cursor
+          >
+            <CardInner c={c} />
+          </a>
+        ) : (
+          <CardInner c={c} />
+        )}
       </motion.div>
     </div>
   );
@@ -222,92 +300,48 @@ export function Evidence() {
 
   const Header = (
     <div className="px-[6vw] md:pl-[28vw]">
-      <p className="label-mono">EVIDENCE // ANTIDOTES</p>
-      <h2
-        className="h-display mt-5"
-        style={{ fontSize: "clamp(36px,5vw,64px)", maxWidth: 700 }}
+      <p
+        className="mono"
+        style={{ fontSize: 11, letterSpacing: "0.2em", color: "#c41e0e" }}
       >
-        The interfaces that stopped capital from leaving.
+        {"// WEB STUDIO & STRATEGIC WORK"}
+      </p>
+      <p className="label-mono mt-2">EVIDENCE // ANTIDOTES</p>
+      <h2
+        className="h-display mt-3"
+        style={{ fontSize: "clamp(30px,4vw,56px)", maxWidth: 680 }}
+      >
+        Proof, not decoration.
       </h2>
       <p
-        className="mt-4"
-        style={{ color: "var(--text-secondary)", fontSize: 18 }}
+        className="mt-3"
+        style={{ color: "var(--text-secondary)", fontSize: 16 }}
       >
-        Three engagements. Measured outcomes. No decoration.
+        Two live sites. Three strategic engagements.
       </p>
     </div>
   );
 
   if (isMobile) {
     return (
-      <section id="evidence" className="w-full py-24">
+      <section id="evidence" className="relative w-full py-24">
+        <SectionTag n="03" />
         {Header}
         <div className="mt-12 flex flex-col gap-8 px-5">
-          {CASES.map((c) => (
-            <GlassCard
-              key={c.n}
-              className="rounded-[6px]"
-              style={{ padding: 28 }}
-            >
-              <div
-                className="mono"
-                style={{
-                  fontSize: 64,
-                  fontWeight: 900,
-                  color: "rgba(0,0,0,0.06)",
-                  lineHeight: 1,
-                }}
+          {CASES.map((c) =>
+            c.kind === "live" && c.link ? (
+              <a
+                key={c.n}
+                href={`https://${c.link}`}
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                {c.n}
-              </div>
-              <p className="label-mono mt-3">{c.industry}</p>
-              <p
-                className="mono"
-                style={{ fontSize: 18, fontWeight: 700, marginTop: 4 }}
-              >
-                {c.company}
-              </p>
-              <div
-                className="mono mt-5"
-                style={{
-                  fontSize: 40,
-                  fontWeight: 700,
-                  color: "var(--accent)",
-                }}
-              >
-                {c.metric}
-              </div>
-              <p
-                style={{ color: "var(--text-secondary)", fontSize: 14 }}
-              >
-                {c.metricLabel}
-              </p>
-              <p
-                className="mt-4"
-                style={{ fontSize: 15, lineHeight: 1.6 }}
-              >
-                {c.desc}
-              </p>
-              <div className="mt-5 flex flex-wrap gap-2">
-                {c.tags.map((t) => (
-                  <span
-                    key={t}
-                    className="mono"
-                    style={{
-                      fontSize: 10,
-                      letterSpacing: "0.12em",
-                      color: "var(--text-secondary)",
-                      border: "1px solid var(--border)",
-                      borderRadius: 999,
-                      padding: "4px 10px",
-                    }}
-                  >
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </GlassCard>
-          ))}
+                <CardInner c={c} />
+              </a>
+            ) : (
+              <CardInner key={c.n} c={c} />
+            ),
+          )}
         </div>
       </section>
     );
@@ -320,9 +354,13 @@ export function Evidence() {
       style={{ height: `${total * 100}vh` }}
       className="relative w-full"
     >
-      <div className="sticky top-0 flex h-screen flex-col overflow-hidden">
-        <div className="pt-[12vh]">{Header}</div>
-        <motion.div className="flex flex-1 items-center" style={{ x }}>
+      <div className="sticky top-0 flex h-screen max-h-screen flex-col overflow-hidden">
+        <SectionTag n="03" />
+        <div className="shrink-0 pt-[8vh] pb-[3vh]">{Header}</div>
+        <motion.div
+          className="flex min-h-0 flex-1 items-center"
+          style={{ x }}
+        >
           {CASES.map((c, i) => (
             <Panel
               key={c.n}

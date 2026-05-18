@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { SectionTag } from "../SectionTag";
 
 export function Close() {
   return (
@@ -8,6 +9,7 @@ export function Close() {
       className="relative flex min-h-screen w-full items-center justify-center overflow-hidden"
       style={{ background: "#1a1a1e" }}
     >
+      <SectionTag n="05" dark />
       {/* ambient radial pulses */}
       {[0, 2.5].map((delay) => (
         <motion.div
@@ -68,6 +70,22 @@ export function Close() {
         >
           AVAILABILITY
         </motion.p>
+
+        <motion.span
+          aria-hidden
+          initial={{ scaleX: 0, opacity: 0 }}
+          whileInView={{ scaleX: 1, opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1], delay: 0.15 }}
+          style={{
+            display: "block",
+            width: 40,
+            height: 2,
+            background: "#c41e0e",
+            marginTop: 24,
+            transformOrigin: "left",
+          }}
+        />
 
         <motion.h2
           initial={{ opacity: 0, y: 20 }}

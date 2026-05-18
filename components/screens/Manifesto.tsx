@@ -9,6 +9,7 @@ import {
 } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useSite } from "../SiteProvider";
+import { SectionTag } from "../SectionTag";
 
 const SYS = "[ SYSTEM INITIALIZED. VER. 2026.4 ]";
 const EASE = [0.4, 0, 0.2, 1] as const;
@@ -69,7 +70,7 @@ export function Manifesto() {
   const slashColor = useTransform(
     scrollYProgress,
     [0.15, 0.5],
-    ["#1a1a1e", "#d1d1d6"],
+    ["#c41e0e", "#d1d1d6"],
   );
   const restOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
 
@@ -84,7 +85,7 @@ export function Manifesto() {
     x = slashLX,
   ) =>
     reduce
-      ? { color: "#1a1a1e" as const }
+      ? { color: "#c41e0e" as const }
       : {
           x,
           rotate: rot,
@@ -95,7 +96,8 @@ export function Manifesto() {
         };
 
   return (
-    <section ref={ref} className="relative h-[180vh] w-full">
+    <section ref={ref} className="relative h-[135vh] w-full">
+      <SectionTag n="01" />
       <div className="sticky top-0 flex h-screen w-full items-center justify-center overflow-hidden">
         <div className="flex flex-col items-center px-6 text-center">
           <motion.div
@@ -172,13 +174,15 @@ export function Manifesto() {
             <span
               style={{
                 display: "block",
-                maxWidth: 560,
-                fontSize: 20,
-                lineHeight: 1.6,
+                maxWidth: 520,
+                fontWeight: 400,
+                fontSize: 22,
+                lineHeight: 1.5,
               }}
             >
-              We think like investors. Execute like engineers. Interfaces built
-              to survive million-dollar audits.
+              Your product is ready.
+              <br />
+              Your site isn&apos;t.
             </span>
           </motion.p>
 
@@ -199,12 +203,20 @@ export function Manifesto() {
 
           <motion.div
             style={{ opacity: restOpacity }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 2.6, duration: 1 }}
-            className="label-mono absolute bottom-10 left-1/2 -translate-x-1/2"
+            className="absolute bottom-10 left-1/2 -translate-x-1/2"
           >
-            scroll ↓
+            <motion.div
+              className="label-mono"
+              style={{ opacity: 0.4 }}
+              animate={reduce ? {} : { y: [0, -8, 0] }}
+              transition={{
+                duration: 2,
+                ease: "easeInOut",
+                repeat: Infinity,
+              }}
+            >
+              SCROLL ↓
+            </motion.div>
           </motion.div>
         </div>
       </div>

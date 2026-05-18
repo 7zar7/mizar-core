@@ -1,11 +1,8 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { useSite } from "./SiteProvider";
 
 export function Nav() {
-  const { heroPassed } = useSite();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -24,7 +21,7 @@ export function Nav() {
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
         borderBottom: scrolled
-          ? "1px solid var(--border)"
+          ? "1px solid #E4E4E7"
           : "1px solid transparent",
         transition: "border-color 250ms ease",
       }}
@@ -34,27 +31,7 @@ export function Nav() {
         className="font-display"
         style={{ fontSize: 20, color: "var(--text-primary)" }}
       >
-        <AnimatePresence mode="wait" initial={false}>
-          {heroPassed ? (
-            <motion.span
-              key="full"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              MIZAR <span className="font-light">{"//"}</span> CORE
-            </motion.span>
-          ) : (
-            <motion.span
-              key="ghost"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.45 }}
-              exit={{ opacity: 0 }}
-            >
-              MIZAR
-            </motion.span>
-          )}
-        </AnimatePresence>
+        MIZAR <span className="font-light">{"//"}</span> CORE
       </a>
 
       <a
