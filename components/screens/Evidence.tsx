@@ -352,6 +352,13 @@ function FlipCard({ c }: { c: CaseStudy }) {
     animating.current = true;
     const root = rootRef.current;
     const crack = crackRef.current;
+
+    // Structured top-to-bottom panel reveal. Enter folds top→bottom;
+    // leave is the exact reverse (bottom→top). Same easing curve,
+    // no random timing or stagger.
+    const lead = next === "back" ? topInner.current : botInner.current;
+    const follow = next === "back" ? botInner.current : topInner.current;
+
     gsap
       .timeline({
         onComplete: () => {
@@ -359,33 +366,32 @@ function FlipCard({ c }: { c: CaseStudy }) {
           if (target.current !== next) flipTo(target.current);
         },
       })
-      .set(crack, { opacity: 1 })
-      .to(topInner.current, {
-        rotationX: -90,
-        duration: 0.15,
-        ease: "power2.in",
-      })
+      .set(crack, { opacity: 1 }, 0)
+      // fold
+      .to(lead, { rotationX: -90, duration: 0.18, ease: "power2.in" }, 0)
+      .to(
+        follow,
+        { rotationX: -90, duration: 0.18, ease: "power2.in" },
+        0.08,
+      )
+      // both hidden → swap content + mechanical click flash
       .add(() => {
         setSide(next);
         if (root)
           gsap.fromTo(
             root,
             { boxShadow: "0 0 8px rgba(0,0,0,0.2)" },
-            { boxShadow: "0 8px 40px rgba(0,0,0,0.06)", duration: 0.1 },
+            { boxShadow: "0 8px 40px rgba(0,0,0,0.06)", duration: 0.12 },
           );
-        gsap.set(botInner.current, { rotationX: 90 });
-      })
+      }, 0.26)
+      // unfold
+      .to(lead, { rotationX: 0, duration: 0.2, ease: "power2.out" }, 0.27)
       .to(
-        [topInner.current, botInner.current],
-        {
-          rotationX: 0,
-          duration: 0.15,
-          ease: "power2.out",
-          stagger: 0.05,
-        },
-        ">",
+        follow,
+        { rotationX: 0, duration: 0.2, ease: "power2.out" },
+        0.33,
       )
-      .set(crack, { opacity: 0 });
+      .set(crack, { opacity: 0 }, 0.55);
   };
 
   useEffect(() => {
@@ -454,7 +460,7 @@ function FlipCard({ c }: { c: CaseStudy }) {
           right: 0,
           height: "200%",
           [which === "top" ? "top" : "bottom"]: 0,
-          transformOrigin: which === "top" ? "center bottom" : "center top",
+          transformOrigin: which === "top" ? "center top" : "center bottom",
           backfaceVisibility: "hidden",
           willChange: "transform",
         }}
