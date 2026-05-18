@@ -244,7 +244,7 @@ export function HeroSlashScroll() {
         gsap.set([mizar, core], { opacity: 1 });
         gsap.fromTo(
           [mizar, core],
-          { color: "#00E5FF" },
+          { color: "#C41E0E" },
           { color: "#18181B", duration: 0.6, ease: "none" },
         );
         if (mizar) killM = scramble(mizar, "MIZAR", 600);

@@ -2,8 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { GlassCard } from "../GlassCard";
 import { SectionTag } from "../SectionTag";
 
 type CaseStudy = {
@@ -103,45 +101,136 @@ const shot = (url: string) =>
     `https://${url}`,
   )}?w=1000`;
 
-function DarkMetric({ metric }: { metric: string }) {
+const TAG = (t: string) => (
+  <span
+    key={t}
+    className="mono"
+    style={{
+      fontSize: 10,
+      letterSpacing: "0.12em",
+      color: "var(--text-secondary)",
+      border: "1px solid var(--border)",
+      borderRadius: 999,
+      padding: "5px 12px",
+    }}
+  >
+    {t}
+  </span>
+);
+
+/** FRONT — origin marker, company, big metric, tags. */
+function FrontFace({ c }: { c: CaseStudy }) {
+  const dark = c.kind === "nda";
   return (
     <div
-      className="flex h-full w-full flex-col items-center justify-center"
-      style={{ background: "#1a1a1e" }}
+      className="flex h-full w-full flex-col overflow-hidden"
+      style={{
+        padding: 24,
+        borderRadius: "4px 0px 24px 0px",
+        background: dark
+          ? "rgba(26,26,30,0.92)"
+          : "rgba(255,255,255,0.72)",
+        WebkitBackdropFilter: "blur(30px) saturate(120%)",
+        backdropFilter: "blur(30px) saturate(120%)",
+        border: dark
+          ? "1px solid rgba(196,30,14,0.3)"
+          : "1px solid rgba(228,228,231,0.8)",
+        boxShadow: "0 8px 40px rgba(0,0,0,0.06)",
+        position: "relative",
+      }}
     >
-      <p
-        className="mono"
+      <span
+        aria-hidden
         style={{
-          fontSize: 10,
-          letterSpacing: "0.22em",
-          color: "rgba(255,255,255,0.35)",
-          fontStyle: "italic",
-          padding: "0 24px",
-          textAlign: "center",
-          marginBottom: 14,
+          position: "absolute",
+          top: 0,
+          right: 0,
+          width: 16,
+          height: 16,
+          background: "#c41e0e",
+          clipPath: "polygon(100% 0, 0 0, 100% 100%)",
         }}
-      >
-        Strategy delivered as standalone engagements. Same thinking goes
-        into every site we build.
-      </p>
-      <div
-        className="mono"
-        style={{
-          fontSize: 48,
-          fontWeight: 700,
-          color: "#c41e0e",
-          letterSpacing: "-0.02em",
-        }}
-      >
-        {metric}
+      />
+      <div className="flex items-start justify-between">
+        <div>
+          <span style={{ display: "block", fontSize: 26, lineHeight: 1 }}>
+            {c.flag}
+          </span>
+          <span
+            className="mono"
+            style={{
+              display: "block",
+              marginTop: 4,
+              fontSize: 9,
+              letterSpacing: "0.2em",
+              color: dark ? "rgba(255,255,255,0.4)" : "var(--text-muted)",
+            }}
+          >
+            {c.city}
+          </span>
+        </div>
+        <span
+          className="mono"
+          style={{
+            fontSize: 11,
+            color: dark ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.12)",
+            letterSpacing: "0.1em",
+          }}
+        >
+          {c.n}
+        </span>
+      </div>
+
+      <div className="mt-auto">
+        <div
+          className="mono"
+          style={{
+            fontSize: "clamp(34px,3vw,56px)",
+            fontWeight: 700,
+            color: "#c41e0e",
+            lineHeight: 1,
+            letterSpacing: "-0.02em",
+          }}
+        >
+          {c.metric}
+        </div>
+        <p
+          style={{
+            color: dark ? "rgba(255,255,255,0.6)" : "var(--text-secondary)",
+            fontSize: 13,
+            marginTop: 6,
+          }}
+        >
+          {c.metricLabel}
+        </p>
+        <p
+          className="mono"
+          style={{
+            fontSize: 15,
+            fontWeight: 700,
+            letterSpacing: "0.02em",
+            marginTop: 12,
+            color: dark ? "#fff" : "var(--text-primary)",
+          }}
+        >
+          {c.company}
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">{c.tags.map(TAG)}</div>
       </div>
     </div>
   );
 }
 
-function LiveShot({ url, metric }: { url: string; metric: string }) {
+function LiveShot({ url }: { url: string }) {
   const [err, setErr] = useState(false);
-  if (err) return <DarkMetric metric={metric} />;
+  if (err)
+    return (
+      <div
+        className="h-full w-full"
+        style={{ background: "#1a1a1e" }}
+        aria-hidden
+      />
+    );
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
@@ -154,296 +243,347 @@ function LiveShot({ url, metric }: { url: string; metric: string }) {
   );
 }
 
-function CardBody({ c }: { c: CaseStudy }) {
+/** BACK — screenshot / strategy detail + link. */
+function BackFace({ c }: { c: CaseStudy }) {
   return (
-    <div style={{ padding: 28 }}>
-      <div className="flex flex-wrap gap-2">
-        {c.tags.map((t) => (
-          <span
-            key={t}
+    <div
+      className="relative flex h-full w-full flex-col overflow-hidden"
+      style={{
+        borderRadius: "4px 0px 24px 0px",
+        background: "#1a1a1e",
+        border: "1px solid rgba(196,30,14,0.3)",
+      }}
+    >
+      {c.kind === "live" && c.link ? (
+        <div className="absolute inset-0" style={{ opacity: 0.5 }}>
+          <LiveShot url={c.link} />
+        </div>
+      ) : null}
+      <div
+        className="relative mt-auto flex flex-col"
+        style={{
+          padding: 24,
+          background:
+            "linear-gradient(to top, rgba(26,26,30,0.96), rgba(26,26,30,0.4))",
+        }}
+      >
+        <p
+          className="mono"
+          style={{
+            fontSize: 14,
+            fontWeight: 700,
+            color: "#fff",
+            letterSpacing: "0.04em",
+          }}
+        >
+          {c.company}
+        </p>
+        <p
+          style={{
+            color: "rgba(255,255,255,0.7)",
+            fontSize: 13,
+            lineHeight: 1.55,
+            marginTop: 8,
+          }}
+        >
+          {c.desc}
+        </p>
+        {c.kind === "nda" ? (
+          <p
             className="mono"
             style={{
               fontSize: 10,
-              letterSpacing: "0.12em",
-              color: "var(--text-secondary)",
-              border: "1px solid var(--border)",
-              borderRadius: 999,
-              padding: "5px 12px",
+              fontStyle: "italic",
+              color: "rgba(255,255,255,0.4)",
+              marginTop: 10,
             }}
           >
-            {t}
-          </span>
-        ))}
+            Scope anonymized per NDA
+          </p>
+        ) : (
+          <a
+            href={`https://${c.link}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-cursor
+            className="mono"
+            style={{
+              fontSize: 12,
+              color: "#c41e0e",
+              borderBottom: "1px solid #c41e0e",
+              paddingBottom: 2,
+              marginTop: 12,
+              alignSelf: "flex-start",
+            }}
+          >
+            {c.link} ↗
+          </a>
+        )}
       </div>
-      <p
-        className="mono"
-        style={{
-          fontSize: 22,
-          fontWeight: 700,
-          letterSpacing: "0.02em",
-          color: "var(--text-primary)",
-          marginTop: 16,
-        }}
-      >
-        {c.company}
-      </p>
-      <div
-        className="mono"
-        style={{
-          fontSize: "clamp(40px,5vw,68px)",
-          fontWeight: 700,
-          color: "var(--accent)",
-          lineHeight: 1,
-          letterSpacing: "-0.02em",
-          marginTop: 10,
-        }}
-      >
-        {c.metric}
-      </div>
-      <p
-        style={{
-          color: "var(--text-secondary)",
-          fontSize: 14,
-          marginTop: 6,
-        }}
-      >
-        {c.metricLabel}
-      </p>
-      <p
-        style={{
-          color: "var(--text-primary)",
-          fontSize: 15,
-          lineHeight: 1.55,
-          marginTop: 14,
-          maxWidth: "46ch",
-        }}
-      >
-        {c.desc}
-      </p>
-      {c.link && (
-        <span
-          className="mono"
-          style={{
-            display: "inline-block",
-            fontSize: 12,
-            color: "var(--accent)",
-            borderBottom: "1px solid var(--accent)",
-            paddingBottom: 2,
-            marginTop: 16,
-          }}
-        >
-          {c.link} ↗
-        </span>
-      )}
     </div>
   );
 }
 
-function CardInner({ c }: { c: CaseStudy }) {
-  return (
-    <GlassCard
-      className="max-h-full w-full overflow-hidden"
-      style={{ padding: 0, borderRadius: "4px 0px 24px 0px" }}
-    >
-      {/* folded-corner mark — classified-document feel */}
-      <span
-        aria-hidden
-        style={{
-          position: "absolute",
-          top: 0,
-          right: 0,
-          width: 16,
-          height: 16,
-          background: "#c41e0e",
-          clipPath: "polygon(100% 0, 0 0, 100% 100%)",
-          zIndex: 3,
-        }}
-      />
-      {/* prominent origin marker — flag + city, top-left */}
-      <div
-        style={{
-          position: "absolute",
-          top: 16,
-          left: 18,
-          zIndex: 4,
-          pointerEvents: "none",
-        }}
-      >
-        <span style={{ display: "block", fontSize: 28, lineHeight: 1 }}>
-          {c.flag}
-        </span>
-        <span
-          className="mono"
-          style={{
-            display: "block",
-            marginTop: 4,
-            fontSize: 9,
-            letterSpacing: "0.2em",
-            color: "var(--text-muted)",
-          }}
-        >
-          {c.city}
-        </span>
-      </div>
-      <div style={{ height: 220, width: "100%" }}>
-        {c.kind === "live" && c.link ? (
-          <LiveShot url={c.link} metric={c.metric} />
-        ) : (
-          <DarkMetric metric={c.metric} />
-        )}
-      </div>
-      {/* case-number watermark (flag now lives top-left) */}
-      <span
-        aria-hidden
-        className="mono"
-        style={{
-          position: "absolute",
-          bottom: 10,
-          right: 14,
-          fontSize: 80,
-          fontWeight: 900,
-          lineHeight: 1,
-          letterSpacing: "-0.02em",
-          color: "rgba(0,0,0,0.06)",
-          whiteSpace: "nowrap",
-          pointerEvents: "none",
-          zIndex: 0,
-        }}
-      >
-        {c.n}
-      </span>
-      <div style={{ position: "relative", zIndex: 1 }}>
-        <CardBody c={c} />
-      </div>
-    </GlassCard>
-  );
+function Face({ c, side }: { c: CaseStudy; side: "front" | "back" }) {
+  return side === "front" ? <FrontFace c={c} /> : <BackFace c={c} />;
 }
 
-function CaseCard({ c }: { c: CaseStudy }) {
-  const inner =
-    c.kind === "live" && c.link ? (
-      <a
-        href={`https://${c.link}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block w-full"
-        data-cursor
+/**
+ * Split-flap flip card (railway-board effect). Card splits at the
+ * midpoint; top leaf flips down, content swaps while hidden, bottom
+ * leaf flips up. Crack line + shadow flash sell the mechanical click.
+ */
+function FlipCard({ c }: { c: CaseStudy }) {
+  const big = c.kind === "live";
+  const rootRef = useRef<HTMLDivElement>(null);
+  const topInner = useRef<HTMLDivElement>(null);
+  const botInner = useRef<HTMLDivElement>(null);
+  const crackRef = useRef<HTMLSpanElement>(null);
+  const [side, setSide] = useState<"front" | "back">("front");
+  const target = useRef<"front" | "back">("front");
+  const animating = useRef(false);
+
+  const flipTo = (next: "front" | "back") => {
+    if (target.current === next || animating.current) {
+      target.current = next;
+      return;
+    }
+    target.current = next;
+    animating.current = true;
+    const root = rootRef.current;
+    const crack = crackRef.current;
+    gsap
+      .timeline({
+        onComplete: () => {
+          animating.current = false;
+          if (target.current !== next) flipTo(target.current);
+        },
+      })
+      .set(crack, { opacity: 1 })
+      .to(topInner.current, {
+        rotationX: -90,
+        duration: 0.15,
+        ease: "power2.in",
+      })
+      .add(() => {
+        setSide(next);
+        if (root)
+          gsap.fromTo(
+            root,
+            { boxShadow: "0 0 8px rgba(0,0,0,0.2)" },
+            { boxShadow: "0 8px 40px rgba(0,0,0,0.06)", duration: 0.1 },
+          );
+        gsap.set(botInner.current, { rotationX: 90 });
+      })
+      .to(
+        [topInner.current, botInner.current],
+        {
+          rotationX: 0,
+          duration: 0.15,
+          ease: "power2.out",
+          stagger: 0.05,
+        },
+        ">",
+      )
+      .set(crack, { opacity: 0 });
+  };
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    // live check (robust to viewport changes / preview reloads)
+    const isDesktop = () =>
+      window.matchMedia(
+        "(min-width: 768px) and (prefers-reduced-motion: no-preference)",
+      ).matches;
+
+    const onEnter = () => {
+      if (isDesktop()) flipTo("back");
+    };
+    const onLeave = () => {
+      if (!isDesktop()) return;
+      flipTo("front");
+      gsap.to(root, {
+        rotateY: 0,
+        rotateX: 0,
+        duration: 0.5,
+        ease: "power2.out",
+      });
+    };
+    const onMove = (e: MouseEvent) => {
+      if (!isDesktop()) return;
+      const r = root.getBoundingClientRect();
+      const xv = e.clientX - r.left - r.width / 2;
+      const yv = e.clientY - r.top - r.height / 2;
+      gsap.to(root, {
+        rotateY: xv * 0.05,
+        rotateX: -yv * 0.05,
+        duration: 0.3,
+        ease: "power2.out",
+      });
+    };
+    const onTap = () => {
+      if (!isDesktop()) setSide((s) => (s === "front" ? "back" : "front"));
+    };
+    root.addEventListener("mouseenter", onEnter);
+    root.addEventListener("mouseleave", onLeave);
+    root.addEventListener("mousemove", onMove);
+    root.addEventListener("click", onTap);
+    return () => {
+      root.removeEventListener("mouseenter", onEnter);
+      root.removeEventListener("mouseleave", onLeave);
+      root.removeEventListener("mousemove", onMove);
+      root.removeEventListener("click", onTap);
+    };
+  }, []);
+
+  const leaf = (which: "top" | "bottom") => (
+    <div
+      className="absolute inset-x-0 overflow-hidden"
+      style={
+        which === "top"
+          ? { top: 0, height: "50%", perspective: 1000 }
+          : { bottom: 0, height: "50%", perspective: 1000 }
+      }
+    >
+      <div
+        ref={which === "top" ? topInner : botInner}
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          height: "200%",
+          [which === "top" ? "top" : "bottom"]: 0,
+          transformOrigin: which === "top" ? "center bottom" : "center top",
+          backfaceVisibility: "hidden",
+          willChange: "transform",
+        }}
       >
-        <CardInner c={c} />
-      </a>
-    ) : (
-      <CardInner c={c} />
-    );
+        <Face c={c} side={side} />
+      </div>
+    </div>
+  );
 
   return (
     <div
-      className="case-card flex flex-shrink-0 items-center justify-center"
-      style={{ width: "100vw", padding: "0 6vw", willChange: "filter" }}
+      ref={rootRef}
+      className="flip-card relative"
+      data-cursor
+      style={{
+        gridRow: big ? "span 2" : "span 1",
+        height: "100%",
+        minHeight: big ? 472 : 228,
+        transformStyle: "preserve-3d",
+        willChange: "transform, filter",
+      }}
     >
-      <div style={{ width: "min(640px, 80vw)" }}>{inner}</div>
+      {leaf("top")}
+      {leaf("bottom")}
+      {/* the crack at the split line */}
+      <span
+        ref={crackRef}
+        aria-hidden
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          top: "50%",
+          height: 1,
+          background: "#E4E4E7",
+          opacity: 0,
+          zIndex: 5,
+          pointerEvents: "none",
+        }}
+      />
     </div>
   );
 }
 
 export function Evidence() {
-  const sectionRef = useRef<HTMLElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
 
+  // Anamorphic: cards away from the viewport's vertical centre soften.
   useEffect(() => {
     if (typeof window === "undefined") return;
-    gsap.registerPlugin(ScrollTrigger);
-    const mm = gsap.matchMedia();
-
-    mm.add("(min-width: 768px)", () => {
-      const cards = gsap.utils.toArray<HTMLElement>(".case-card");
-      if (!cards.length) return;
-
-      const applyLens = () => {
-        const half = window.innerWidth / 2;
-        cards.forEach((card) => {
+    const desktop = window.matchMedia("(min-width: 768px)").matches;
+    if (!desktop) return;
+    let raf = 0;
+    const apply = () => {
+      raf = 0;
+      const mid = window.innerHeight / 2;
+      gridRef.current
+        ?.querySelectorAll<HTMLElement>(".flip-card")
+        .forEach((card) => {
           const r = card.getBoundingClientRect();
-          const center = r.left + r.width / 2;
-          const dist = Math.abs(center - half);
-          const blur = (dist / half) * 5;
-          const opacity = 1 - (dist / half) * 0.35;
-          gsap.set(card, {
-            filter: `blur(${Math.max(0, blur).toFixed(2)}px)`,
-            opacity: Math.max(0.5, opacity),
-          });
+          if (r.bottom < 0 || r.top > window.innerHeight) return;
+          const center = r.top + r.height / 2;
+          const dist = Math.min(1, Math.abs(center - mid) / mid);
+          card.style.filter = `blur(${(dist * 4).toFixed(2)}px)`;
+          card.style.opacity = String(1 - dist * 0.35);
+          card.style.transition =
+            "filter 150ms ease-out, opacity 150ms ease-out";
         });
-      };
-
-      const tween = gsap.to(".cards-track", {
-        x: () => -(cards.length - 1) * window.innerWidth,
-        ease: "none",
-        onUpdate: applyLens,
-      });
-
-      const st = ScrollTrigger.create({
-        trigger: ".evidence-section",
-        start: "top top",
-        end: () => "+=" + cards.length * window.innerWidth,
-        pin: true,
-        scrub: 1,
-        invalidateOnRefresh: true,
-        refreshPriority: 2,
-        animation: tween,
-        onRefresh: applyLens,
-      });
-
-      applyLens();
-      return () => st.kill();
-    });
-
-    return () => mm.revert();
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(apply);
+    };
+    apply();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, []);
 
-  const Header = (
-    <div className="px-[6vw] md:pl-[28vw]">
-      <p
-        className="mono"
-        style={{ fontSize: 11, letterSpacing: "0.2em", color: "#c41e0e" }}
-      >
-        {"// WEB STUDIO & STRATEGIC WORK"}
-      </p>
-      <p className="label-mono mt-2">EVIDENCE // ANTIDOTES</p>
-      <h2
-        className="h-display mt-3"
-        style={{ fontSize: "clamp(30px,4vw,56px)", maxWidth: 680 }}
-      >
-        Proof, not decoration.
-      </h2>
-      <p
-        className="mt-3"
-        style={{ color: "var(--text-secondary)", fontSize: 16 }}
-      >
-        Three live sites. Three strategic engagements.
-      </p>
-      <p
-        className="mono"
-        style={{
-          fontSize: 11,
-          color: "var(--text-muted)",
-          marginTop: 12,
-          marginBottom: 32,
-        }}
-      >
-        🇪🇸 Barcelona · 🇮🇹 Milan · 🇨🇦 Canada · 🇺🇸 United States
-      </p>
-    </div>
-  );
-
   return (
-    <section
-      id="evidence"
-      ref={sectionRef}
-      className="evidence-section relative w-full"
-    >
+    <section id="evidence" className="evidence-section relative w-full py-24">
       <SectionTag n="03" />
-      <div className="evi-stage flex h-screen flex-col overflow-hidden">
-        <div className="shrink-0 pt-[8vh] pb-[3vh]">{Header}</div>
-        <div className="cards-track flex min-h-0 flex-1 flex-row items-center">
+      <div className="mx-auto max-w-content px-[6vw]">
+        <p
+          className="mono"
+          style={{ fontSize: 11, letterSpacing: "0.2em", color: "#c41e0e" }}
+        >
+          {"// WEB STUDIO & STRATEGIC WORK"}
+        </p>
+        <p className="label-mono mt-2">EVIDENCE // ANTIDOTES</p>
+        <h2
+          className="h-display mt-3"
+          style={{ fontSize: "clamp(30px,4vw,56px)", maxWidth: 680 }}
+        >
+          Proof, not decoration.
+        </h2>
+        <p
+          className="mt-3"
+          style={{ color: "var(--text-secondary)", fontSize: 16 }}
+        >
+          Three live sites. Three strategic engagements.
+        </p>
+        <p
+          className="mono"
+          style={{
+            fontSize: 11,
+            color: "var(--text-muted)",
+            marginTop: 12,
+            marginBottom: 32,
+          }}
+        >
+          🇪🇸 Barcelona · 🇮🇹 Milan · 🇨🇦 Canada · 🇺🇸 United States
+        </p>
+
+        <div
+          ref={gridRef}
+          className="evi-grid"
+          style={{
+            display: "grid",
+            gap: 16,
+            gridAutoRows: 228,
+            gridAutoFlow: "dense",
+          }}
+        >
           {CASES.map((c) => (
-            <CaseCard key={c.n} c={c} />
+            <FlipCard key={c.n} c={c} />
           ))}
         </div>
       </div>

@@ -59,7 +59,7 @@ export function Manifesto() {
           transform: "translate(-50%, -50%)",
           fontSize: 14,
           letterSpacing: "0.18em",
-          color: "#00E5FF",
+          color: "#C41E0E",
           whiteSpace: "pre",
           zIndex: 5,
           pointerEvents: "none",
