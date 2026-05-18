@@ -244,13 +244,18 @@ body {
 @media (max-width: 767px) {
   .evi-grid {
     grid-template-columns: 1fr !important;
-    grid-auto-rows: auto !important;
   }
-  .evi-grid .flip-card {
-    grid-row: span 1 !important;
-    height: 360px !important;
-    filter: none !important;
-    opacity: 1 !important;
+}
+
+.folder-card {
+  transition: transform 150ms ease;
+}
+@media (hover: hover) {
+  .folder-card:hover {
+    transform: scale(1.01);
+  }
+  .folder-card:hover .folder-grad {
+    filter: brightness(1.15);
   }
 }
 

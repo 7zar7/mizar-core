@@ -1,15 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import gsap from "gsap";
 import { SectionTag } from "../SectionTag";
-
-const CARD_H = 420;
-
-const shot = (url: string) =>
-  `https://s.wordpress.com/mshots/v1/${encodeURIComponent(
-    `https://${url}`,
-  )}?w=1000`;
 
 type CaseStudy = {
   n: string;
@@ -136,378 +127,113 @@ const CASES: CaseStudy[] = [
 ];
 
 
-const CARD_RADIUS = "4px 0px 24px 0px";
+const GRADIENTS: Record<string, string> = {
+  "01": "linear-gradient(135deg,#8B4513 0%,#D2691E 50%,#FF8C00 100%)",
+  "02": "linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%)",
+  "03": "linear-gradient(135deg,#2d1b69 0%,#8B5CF6 50%,#C4B5FD 100%)",
+  "04": "linear-gradient(135deg,#7C3AED 0%,#4F46E5 50%,#3B82F6 100%)",
+  "05": "linear-gradient(135deg,#C41E0E 0%,#DC2626 50%,#F97316 100%)",
+  "06": "linear-gradient(135deg,#0F766E 0%,#0EA5E9 50%,#38BDF8 100%)",
+};
 
-/** PREVIEW (front) — readable state before hover. */
-function Preview({ c }: { c: CaseStudy }) {
-  const live = c.kind === "live";
+/** Digital-folder card: gradient header tab + dark info panel. */
+function FolderCard({ c }: { c: CaseStudy }) {
+  const live = c.kind === "live" && !!c.link;
   return (
     <div
-      className="relative flex h-full w-full flex-col justify-end overflow-hidden"
+      className="folder-card relative overflow-hidden"
+      data-cursor
       style={{
-        borderRadius: CARD_RADIUS,
-        background: "#1A1A1E",
-        border: live
-          ? "1px solid rgba(228,228,231,0.5)"
-          : "1px solid rgba(196,30,14,0.3)",
+        height: 380,
+        background: "#121214",
+        clipPath:
+          "polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 0 100%)",
       }}
     >
-      {live && c.link ? (
-        <>
-          <div
-            aria-hidden
-            style={{
-              position: "absolute",
-              inset: 0,
-              backgroundImage: `url("${shot(c.link)}")`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-          />
-          <div
-            aria-hidden
-            style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.45)" }}
-          />
-        </>
-      ) : null}
-
+      {/* gradient header (55%) */}
       <div
-        className="relative flex items-start justify-between"
-        style={{ padding: "20px 24px 0" }}
-      >
-        <div className="flex items-center gap-2">
-          <span style={{ fontSize: 22, lineHeight: 1 }}>{c.flag}</span>
-          <span
-            className="mono"
-            style={{
-              fontSize: 9,
-              letterSpacing: "0.2em",
-              color: "rgba(255,255,255,0.55)",
-            }}
-          >
-            {c.city}
-          </span>
-        </div>
-        <span
-          className="mono"
-          style={{
-            fontSize: 11,
-            color: "rgba(255,255,255,0.3)",
-            letterSpacing: "0.1em",
-          }}
-        >
-          {c.n}
-        </span>
-      </div>
+        className="folder-grad"
+        aria-hidden
+        style={{
+          height: "55%",
+          background: GRADIENTS[c.n] ?? GRADIENTS["01"],
+          transition: "filter 120ms ease",
+          clipPath:
+            "polygon(0 0, 100% 0, 100% 78%, 62% 78%, 56% 100%, 50% 78%, 0 78%)",
+        }}
+      />
 
-      <div className="relative mt-auto" style={{ padding: "0 24px 24px" }}>
-        <div
+      {/* info panel (45%) */}
+      <div
+        className="flex flex-col"
+        style={{ height: "45%", padding: "16px 22px 20px" }}
+      >
+        <p
           className="mono"
           style={{
-            fontSize: live ? 40 : 52,
-            fontWeight: 700,
-            color: "#C41E0E",
-            lineHeight: 1,
-            letterSpacing: "-0.02em",
+            fontSize: 10,
+            letterSpacing: "0.2em",
+            color: "#666",
           }}
         >
-          {c.metric}
-        </div>
-        <p
-          style={{
-            color: "rgba(255,255,255,0.65)",
-            fontSize: 13,
-            marginTop: 6,
-          }}
-        >
-          {c.metricLabel}
+          {`0${c.n.replace(/^0/, "")}`.slice(-3)} · {c.industry}
         </p>
         <p
-          className="mono"
           style={{
-            fontSize: 16,
             fontWeight: 700,
+            fontSize: 16,
             color: "#fff",
-            letterSpacing: "0.02em",
-            marginTop: 10,
+            marginTop: 8,
           }}
         >
           {c.company}
         </p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {c.tags.map((t) => (
-            <span
-              key={t}
-              className="mono"
-              style={{
-                fontSize: 10,
-                letterSpacing: "0.12em",
-                color: "rgba(255,255,255,0.8)",
-                border: "1px solid rgba(255,255,255,0.3)",
-                borderRadius: 999,
-                padding: "4px 11px",
-              }}
-            >
-              {t}
-            </span>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/** BACK — revealed after the flip. */
-function Back({ c }: { c: CaseStudy }) {
-  const lines = (c.backLines ?? [c.desc]).slice(0, 2);
-  return (
-    <div
-      className="flex h-full w-full flex-col overflow-hidden"
-      style={{
-        borderRadius: CARD_RADIUS,
-        background: "#1A1A1E",
-        border: "1px solid rgba(196,30,14,0.3)",
-        padding: 24,
-      }}
-    >
-      <p
-        className="mono"
-        style={{
-          fontSize: 14,
-          fontWeight: 700,
-          color: "#fff",
-          letterSpacing: "0.04em",
-        }}
-      >
-        {c.company}
-      </p>
-      <p
-        style={{
-          color: "rgba(255,255,255,0.7)",
-          fontSize: 13,
-          lineHeight: 1.5,
-          marginTop: 10,
-        }}
-      >
-        {c.desc}
-      </p>
-      <div className="mt-4 flex flex-col gap-1.5">
-        {lines.map((l) => (
-          <p
-            key={l}
-            className="mono"
-            style={{ color: "rgba(255,255,255,0.55)", fontSize: 11 }}
-          >
-            ▸ {l}
-          </p>
-        ))}
-      </div>
-      <div className="mt-auto" style={{ paddingTop: 14 }}>
-        {c.kind === "nda" ? (
-          <p
-            className="mono"
-            style={{
-              fontSize: 10,
-              fontStyle: "italic",
-              color: "rgba(255,255,255,0.4)",
-            }}
-          >
-            Scope anonymized per NDA
-          </p>
-        ) : (
-          <a
-            href={`https://${c.link}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            data-cursor
-            className="mono"
-            style={{
-              fontSize: 12,
-              color: "#c41e0e",
-              borderBottom: "1px solid #c41e0e",
-              paddingBottom: 2,
-              wordBreak: "break-all",
-            }}
-          >
-            {c.link} ↗
-          </a>
-        )}
-      </div>
-    </div>
-  );
-}
-
-/**
- * Railway split-flap card. The card is 4 horizontal strips; each
- * strip has a front (preview slice) and back (detail slice) and
- * flips independently, staggered top→bottom on enter and
- * bottom→top on leave, with a brief panel "click" flash.
- */
-function RailwayCard({ c }: { c: CaseStudy }) {
-  const rootRef = useRef<HTMLDivElement>(null);
-  const inners = useRef<(HTMLDivElement | null)[]>([]);
-  const flashes = useRef<(HTMLDivElement | null)[]>([]);
-
-  useEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
-    const isDesktop = () =>
-      window.matchMedia(
-        "(min-width: 768px) and (prefers-reduced-motion: no-preference)",
-      ).matches;
-
-    const run = (to: number) => {
-      const order = to === -180 ? [0, 1, 2, 3] : [3, 2, 1, 0];
-      order.forEach((idx, pos) => {
-        const inner = inners.current[idx];
-        const flash = flashes.current[idx];
-        if (!inner) return;
-        gsap.to(inner, {
-          rotationX: to,
-          duration: 0.2,
-          ease: "power2.inOut",
-          delay: pos * 0.06,
-          overwrite: true,
-        });
-        if (flash)
-          gsap
-            .timeline({ delay: pos * 0.06 + 0.085 })
-            .set(flash, { opacity: 0.75 })
-            .to(flash, { opacity: 0, duration: 0.03, ease: "none" });
-      });
-    };
-
-    const onEnter = () => {
-      if (isDesktop()) run(-180);
-    };
-    const onLeave = () => {
-      if (isDesktop()) run(0);
-    };
-    root.addEventListener("mouseenter", onEnter);
-    root.addEventListener("mouseleave", onLeave);
-    return () => {
-      root.removeEventListener("mouseenter", onEnter);
-      root.removeEventListener("mouseleave", onLeave);
-    };
-  }, []);
-
-  return (
-    <div
-      ref={rootRef}
-      className="flip-card relative"
-      data-cursor
-      style={{
-        height: CARD_H,
-        minHeight: CARD_H,
-        minWidth: 0,
-        willChange: "filter",
-      }}
-    >
-      {[0, 1, 2, 3].map((i) => (
-        <div
-          key={i}
-          className="absolute inset-x-0 overflow-hidden"
-          style={{ top: `${i * 25}%`, height: "25%", perspective: 900 }}
+        <p
+          className="mono"
+          style={{ fontSize: 11, color: "#C41E0E", marginTop: 6 }}
         >
-          <div
-            ref={(el) => {
-              inners.current[i] = el;
-            }}
-            style={{
-              position: "absolute",
-              inset: 0,
-              transformStyle: "preserve-3d",
-              willChange: "transform",
-            }}
+          {c.metric} · {c.metricLabel}
+        </p>
+        <p
+          className="mono"
+          style={{ fontSize: 10, color: "#666", marginTop: 6 }}
+        >
+          {c.tags.join(" · ")}
+        </p>
+
+        <div className="mt-auto flex items-end justify-between">
+          <span
+            className="mono"
+            style={{ fontSize: 11, color: "#888" }}
           >
-            <div
-              className="absolute inset-0 overflow-hidden"
-              style={{ backfaceVisibility: "hidden" }}
+            {c.flag} {c.city}
+          </span>
+          {live ? (
+            <a
+              href={`https://${c.link}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-cursor
+              className="mono"
+              style={{ fontSize: 13, color: "#C41E0E" }}
             >
-              <div
-                style={{
-                  position: "absolute",
-                  left: 0,
-                  right: 0,
-                  height: "400%",
-                  top: `${-i * 100}%`,
-                }}
-              >
-                <Preview c={c} />
-              </div>
-            </div>
-            <div
-              className="absolute inset-0 overflow-hidden"
-              style={{
-                backfaceVisibility: "hidden",
-                transform: "rotateX(180deg)",
-              }}
+              ↗
+            </a>
+          ) : (
+            <span
+              className="mono"
+              style={{ fontSize: 10, color: "#666" }}
             >
-              <div
-                style={{
-                  position: "absolute",
-                  left: 0,
-                  right: 0,
-                  height: "400%",
-                  top: `${-i * 100}%`,
-                }}
-              >
-                <Back c={c} />
-              </div>
-            </div>
-          </div>
-          <div
-            ref={(el) => {
-              flashes.current[i] = el;
-            }}
-            aria-hidden
-            className="pointer-events-none absolute inset-0"
-            style={{ background: "#E4E4E7", opacity: 0 }}
-          />
+              NDA
+            </span>
+          )}
         </div>
-      ))}
+      </div>
     </div>
   );
 }
 
 export function Evidence() {
-  const gridRef = useRef<HTMLDivElement>(null);
-
-  // Anamorphic: cards away from the viewport's vertical centre soften.
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const desktop = window.matchMedia("(min-width: 768px)").matches;
-    if (!desktop) return;
-    let raf = 0;
-    const apply = () => {
-      raf = 0;
-      const mid = window.innerHeight / 2;
-      gridRef.current
-        ?.querySelectorAll<HTMLElement>(".flip-card")
-        .forEach((card) => {
-          const r = card.getBoundingClientRect();
-          if (r.bottom < 0 || r.top > window.innerHeight) return;
-          const center = r.top + r.height / 2;
-          const dist = Math.min(1, Math.abs(center - mid) / mid);
-          card.style.filter = `blur(${(dist * 4).toFixed(2)}px)`;
-          card.style.opacity = String(1 - dist * 0.35);
-          card.style.transition =
-            "filter 150ms ease-out, opacity 150ms ease-out";
-        });
-    };
-    const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(apply);
-    };
-    apply();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, []);
-
   return (
     <section id="evidence" className="evidence-section relative w-full py-24">
       <SectionTag n="03" />
@@ -544,17 +270,11 @@ export function Evidence() {
         </p>
 
         <div
-          ref={gridRef}
           className="evi-grid"
-          style={{
-            display: "grid",
-            gap: 16,
-            gridAutoRows: "auto",
-            paddingBottom: 48,
-          }}
+          style={{ display: "grid", gap: 20, paddingBottom: 48 }}
         >
           {CASES.map((c) => (
-            <RailwayCard key={c.n} c={c} />
+            <FolderCard key={c.n} c={c} />
           ))}
         </div>
       </div>
