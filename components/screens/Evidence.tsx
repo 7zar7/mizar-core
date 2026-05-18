@@ -1,13 +1,8 @@
 "use client";
 
-import {
-  motion,
-  useScroll,
-  useTransform,
-  type MotionValue,
-} from "framer-motion";
-import { useRef, useState } from "react";
-import { useSite } from "../SiteProvider";
+import { useEffect, useRef, useState } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { GlassCard } from "../GlassCard";
 import { SectionTag } from "../SectionTag";
 
@@ -324,66 +319,83 @@ function CardInner({ c }: { c: CaseStudy }) {
   );
 }
 
-function Panel({
-  c,
-  i,
-  total,
-  progress,
-}: {
-  c: CaseStudy;
-  i: number;
-  total: number;
-  progress: MotionValue<number>;
-}) {
-  const focus = total > 1 ? i / (total - 1) : 0;
-  const span = 1 / (total - 1);
-  const pts = [focus - span, focus, focus + span];
-
-  const blurN = useTransform(progress, pts, [3, 0, 3], { clamp: true });
-  const filter = useTransform(blurN, (b) => `blur(${b.toFixed(2)}px)`);
-  const opacity = useTransform(progress, pts, [0.7, 1, 0.7], { clamp: true });
-  const scale = useTransform(progress, pts, [1, 1.02, 1], { clamp: true });
+function CaseCard({ c }: { c: CaseStudy }) {
+  const inner =
+    c.kind === "live" && c.link ? (
+      <a
+        href={`https://${c.link}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block w-full"
+        data-cursor
+      >
+        <CardInner c={c} />
+      </a>
+    ) : (
+      <CardInner c={c} />
+    );
 
   return (
-    <div className="flex h-full w-screen flex-shrink-0 items-center justify-center px-[6vw]">
-      <motion.div
-        className="will-anim flex max-h-full"
-        style={{ filter, opacity, scale, width: "min(640px, 80vw)" }}
-        whileHover={{ y: -4 }}
-        transition={{ type: "spring", stiffness: 220, damping: 22 }}
-      >
-        {c.kind === "live" && c.link ? (
-          <a
-            href={`https://${c.link}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block w-full"
-            data-cursor
-          >
-            <CardInner c={c} />
-          </a>
-        ) : (
-          <CardInner c={c} />
-        )}
-      </motion.div>
+    <div
+      className="case-card flex flex-shrink-0 items-center justify-center"
+      style={{ width: "100vw", padding: "0 6vw", willChange: "filter" }}
+    >
+      <div style={{ width: "min(640px, 80vw)" }}>{inner}</div>
     </div>
   );
 }
 
 export function Evidence() {
-  const ref = useRef<HTMLDivElement>(null);
-  const { isMobile } = useSite();
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end end"],
-  });
+  const sectionRef = useRef<HTMLElement>(null);
 
-  const total = CASES.length;
-  const x = useTransform(
-    scrollYProgress,
-    [0, 1],
-    ["0vw", `-${(total - 1) * 100}vw`],
-  );
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    gsap.registerPlugin(ScrollTrigger);
+    const mm = gsap.matchMedia();
+
+    mm.add("(min-width: 768px)", () => {
+      const cards = gsap.utils.toArray<HTMLElement>(".case-card");
+      if (!cards.length) return;
+
+      const applyLens = () => {
+        const half = window.innerWidth / 2;
+        cards.forEach((card) => {
+          const r = card.getBoundingClientRect();
+          const center = r.left + r.width / 2;
+          const dist = Math.abs(center - half);
+          const blur = (dist / half) * 5;
+          const opacity = 1 - (dist / half) * 0.35;
+          gsap.set(card, {
+            filter: `blur(${Math.max(0, blur).toFixed(2)}px)`,
+            opacity: Math.max(0.5, opacity),
+          });
+        });
+      };
+
+      const tween = gsap.to(".cards-track", {
+        x: () => -(cards.length - 1) * window.innerWidth,
+        ease: "none",
+        onUpdate: applyLens,
+      });
+
+      const st = ScrollTrigger.create({
+        trigger: ".evidence-section",
+        start: "top top",
+        end: () => "+=" + cards.length * window.innerWidth,
+        pin: true,
+        scrub: 1,
+        invalidateOnRefresh: true,
+        refreshPriority: 2,
+        animation: tween,
+        onRefresh: applyLens,
+      });
+
+      applyLens();
+      return () => st.kill();
+    });
+
+    return () => mm.revert();
+  }, []);
 
   const Header = (
     <div className="px-[6vw] md:pl-[28vw]">
@@ -420,55 +432,20 @@ export function Evidence() {
     </div>
   );
 
-  if (isMobile) {
-    return (
-      <section id="evidence" className="relative w-full py-24">
-        <SectionTag n="03" />
-        {Header}
-        <div className="mt-12 flex flex-col gap-8 px-5">
-          {CASES.map((c) =>
-            c.kind === "live" && c.link ? (
-              <a
-                key={c.n}
-                href={`https://${c.link}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <CardInner c={c} />
-              </a>
-            ) : (
-              <CardInner key={c.n} c={c} />
-            ),
-          )}
-        </div>
-      </section>
-    );
-  }
-
   return (
     <section
       id="evidence"
-      ref={ref}
-      style={{ height: `${total * 100}vh` }}
-      className="relative w-full"
+      ref={sectionRef}
+      className="evidence-section relative w-full"
     >
-      <div className="sticky top-0 flex h-screen max-h-screen flex-col overflow-hidden">
-        <SectionTag n="03" />
+      <SectionTag n="03" />
+      <div className="evi-stage flex h-screen flex-col overflow-hidden">
         <div className="shrink-0 pt-[8vh] pb-[3vh]">{Header}</div>
-        <motion.div
-          className="flex min-h-0 flex-1 items-center"
-          style={{ x }}
-        >
-          {CASES.map((c, i) => (
-            <Panel
-              key={c.n}
-              c={c}
-              i={i}
-              total={total}
-              progress={scrollYProgress}
-            />
+        <div className="cards-track flex min-h-0 flex-1 flex-row items-center">
+          {CASES.map((c) => (
+            <CaseCard key={c.n} c={c} />
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );

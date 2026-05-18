@@ -1,7 +1,8 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import gsap from "gsap";
 import { SectionTag } from "../SectionTag";
 
 const EASE = [0.4, 0, 0.2, 1] as const;
@@ -28,6 +29,8 @@ type Result = {
   value: string;
   delivery: string;
   deliverable: string;
+  priceFrom?: number;
+  priceTo?: number;
 };
 
 function compute(stage: Stage, slider: number): Result {
@@ -40,8 +43,7 @@ function compute(stage: Stage, slider: number): Result {
     };
   }
 
-  const baseTier =
-    stage === "PRE-SEED" ? "launch" : "build";
+  const baseTier = stage === "PRE-SEED" ? "launch" : "build";
   const tier = slider > 60 && baseTier === "launch" ? "build" : baseTier;
 
   if (tier === "launch") {
@@ -50,6 +52,8 @@ function compute(stage: Stage, slider: number): Result {
       value: "$2,500 – $4,500",
       delivery: "5 – 10 days",
       deliverable: "Positioning Document",
+      priceFrom: 2500,
+      priceTo: 4500,
     };
   }
   return {
@@ -57,7 +61,86 @@ function compute(stage: Stage, slider: number): Result {
     value: "$5,000 – $8,000",
     delivery: "10 – 14 days",
     deliverable: "Architecture Brief",
+    priceFrom: 5000,
+    priceTo: 8000,
   };
+}
+
+function fmtPrice(v: number) {
+  return v >= 1000 ? "$" + (v / 1000).toFixed(1) + "K" : "$" + v;
+}
+
+/** Odometer row — min & max price values count up/down on change. */
+function OdometerRow({
+  label,
+  from,
+  to,
+}: {
+  label: string;
+  from: number;
+  to: number;
+}) {
+  const minRef = useRef<HTMLSpanElement>(null);
+  const maxRef = useRef<HTMLSpanElement>(null);
+  const prev = useRef({ from, to });
+
+  useEffect(() => {
+    const run = (
+      el: React.RefObject<HTMLSpanElement>,
+      a: number,
+      b: number,
+    ) => {
+      const o = { val: a };
+      gsap.to(o, {
+        val: b,
+        duration: 0.5,
+        ease: "power2.out",
+        roundProps: "val",
+        onUpdate: () => {
+          if (el.current) el.current.textContent = fmtPrice(o.val);
+        },
+      });
+    };
+    run(minRef, prev.current.from, from);
+    run(maxRef, prev.current.to, to);
+    prev.current = { from, to };
+  }, [from, to]);
+
+  return (
+    <div className="flex items-end gap-3">
+      <span
+        className="mono"
+        style={{
+          fontSize: 10,
+          letterSpacing: "0.16em",
+          color: "var(--text-muted)",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {label}
+      </span>
+      <span
+        aria-hidden
+        style={{
+          flex: 1,
+          borderBottom: "1px dotted #d1d1d6",
+          transform: "translateY(-3px)",
+        }}
+      />
+      <span
+        className="mono"
+        style={{
+          fontSize: 13,
+          color: "var(--text-primary)",
+          whiteSpace: "nowrap",
+        }}
+      >
+        <span ref={minRef}>{fmtPrice(from)}</span>
+        {" – "}
+        <span ref={maxRef}>{fmtPrice(to)}</span>
+      </span>
+    </div>
+  );
 }
 
 function ToggleRow<T extends string>({
@@ -200,13 +283,60 @@ export function Configurator() {
   const [vertical, setVertical] = useState<Vertical>("WEB STUDIO");
   const [slider, setSlider] = useState(20);
   const [opened, setOpened] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
 
   const result = useMemo(() => compute(stage, slider), [stage, slider]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const reduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    const L = section.querySelector(".split-left");
+    const R = section.querySelector(".split-right");
+    if (!L || !R) return;
+
+    if (reduced) {
+      gsap.set([L, R], { xPercent: (i) => (i === 0 ? -100 : 100) });
+      return;
+    }
+
+    // IntersectionObserver fires when the section's top crosses ~75%
+    // of the viewport — robust to the upstream pin spacers (no
+    // ScrollTrigger position math across multiple pins).
+    let open = false;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        const shouldOpen = entry.isIntersecting;
+        if (shouldOpen === open) return;
+        open = shouldOpen;
+        gsap.to(L, {
+          xPercent: shouldOpen ? -100 : 0,
+          duration: 0.7,
+          ease: "power3.inOut",
+          overwrite: true,
+        });
+        gsap.to(R, {
+          xPercent: shouldOpen ? 100 : 0,
+          duration: 0.7,
+          ease: "power3.inOut",
+          overwrite: true,
+        });
+      },
+      { rootMargin: "0px 0px -25% 0px", threshold: 0 },
+    );
+    io.observe(section);
+    return () => io.disconnect();
+  }, []);
 
   return (
     <section
       id="configurator"
-      className="flex min-h-screen w-full items-center justify-center py-28"
+      ref={sectionRef}
+      className="configurator-section flex min-h-screen w-full items-center justify-center py-28"
       style={{
         background: "#f0f0f2",
         position: "relative",
@@ -215,6 +345,35 @@ export function Configurator() {
       }}
     >
       <SectionTag n="04" />
+
+      {/* THE SPLIT — panels cover the configurator, then slide apart */}
+      <div
+        className="split-left"
+        aria-hidden
+        style={{
+          position: "absolute",
+          left: 0,
+          top: 0,
+          width: "50%",
+          height: "100%",
+          background: "#F5F5F7",
+          zIndex: 10,
+        }}
+      />
+      <div
+        className="split-right"
+        aria-hidden
+        style={{
+          position: "absolute",
+          right: 0,
+          top: 0,
+          width: "50%",
+          height: "100%",
+          background: "#F5F5F7",
+          zIndex: 10,
+        }}
+      />
+
       <div className="w-full px-6">
         <div className="mx-auto mb-12 max-w-[760px]">
           <p
@@ -381,7 +540,15 @@ export function Configurator() {
               }}
             >
               <OutputRow label="RECOMMENDED" value={result.engagement} />
-              <OutputRow label="ESTIMATED VALUE" value={result.value} />
+              {result.priceFrom != null && result.priceTo != null ? (
+                <OdometerRow
+                  label="ESTIMATED VALUE"
+                  from={result.priceFrom}
+                  to={result.priceTo}
+                />
+              ) : (
+                <OutputRow label="ESTIMATED VALUE" value={result.value} />
+              )}
               <OutputRow label="DELIVERY" value={result.delivery} />
               <OutputRow
                 label="FIRST DELIVERABLE"

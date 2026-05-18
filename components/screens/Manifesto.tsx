@@ -90,7 +90,7 @@ export function Manifesto() {
                 y1="0"
                 x2="15"
                 y2="80"
-                stroke="#00E5FF"
+                stroke="#C41E0E"
                 strokeWidth="1.5"
               />
               <line
@@ -99,7 +99,7 @@ export function Manifesto() {
                 y1="0"
                 x2="30"
                 y2="80"
-                stroke="#00E5FF"
+                stroke="#C41E0E"
                 strokeWidth="1.5"
               />
             </svg>

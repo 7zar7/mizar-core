@@ -54,10 +54,8 @@ export function HeroSlashScroll() {
           window.addEventListener("pointermove", onMove, { passive: true });
 
           tick = () => {
-            if (window.scrollY > 8) {
-              tM = 0;
-              tC = 0;
-            }
+            // once detonating, hand X over to the scrubbed timeline
+            if (window.scrollY > 8) return;
             cM += (tM - cM) * 0.06;
             cC += (tC - cC) * 0.06;
             mizarX(cM);
@@ -82,16 +80,17 @@ export function HeroSlashScroll() {
             scrollTrigger: {
               trigger: ".hero-section",
               start: "top top",
-              end: "+=120%",
+              end: "+=150%",
               pin: true,
               scrub: 1,
               invalidateOnRefresh: true,
+              refreshPriority: 3,
             },
           })
             .to(
               ".mizar-word",
               {
-                xPercent: -260,
+                x: -600,
                 scale: 3.5,
                 opacity: 0,
                 filter: "blur(15px)",
@@ -103,7 +102,7 @@ export function HeroSlashScroll() {
             .to(
               ".core-word",
               {
-                xPercent: 260,
+                x: 600,
                 scale: 3.5,
                 opacity: 0,
                 filter: "blur(15px)",
@@ -114,7 +113,7 @@ export function HeroSlashScroll() {
             )
             .to(
               ".logo-slashes",
-              { rotation: 0, scaleY: 20, duration: 1, ease: "none" },
+              { rotation: 0, scaleY: 30, duration: 1, ease: "none" },
               0,
             )
             .to(
@@ -151,12 +150,11 @@ export function HeroSlashScroll() {
           )
           .fromTo(
             ".mizar-word",
-            { x: -200, opacity: 0, filter: "blur(8px)" },
+            { x: -300, opacity: 0, filter: "blur(8px)" },
             {
               x: 0,
               opacity: 1,
               filter: "blur(0px)",
-              letterSpacing: "0.15em",
               duration: 0.6,
               ease: "power3.out",
             },
@@ -164,7 +162,7 @@ export function HeroSlashScroll() {
           )
           .fromTo(
             ".core-word",
-            { x: 200, opacity: 0, filter: "blur(8px)" },
+            { x: 300, opacity: 0, filter: "blur(8px)" },
             {
               x: 0,
               opacity: 1,

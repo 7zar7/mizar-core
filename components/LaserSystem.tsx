@@ -300,7 +300,7 @@ export function LaserSystem() {
   return (
     <div
       aria-hidden
-      className="pointer-events-none fixed inset-0 z-[2]"
+      className="pointer-events-none fixed inset-0 z-0"
       style={{ contain: "strict" }}
     >
       {!isMobile && (

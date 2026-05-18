@@ -233,6 +233,25 @@ body {
   }
 }
 
+@media (max-width: 767px) {
+  .evidence-section .evi-stage {
+    height: auto;
+    overflow: visible;
+    padding-bottom: 6vh;
+  }
+  .evidence-section .cards-track {
+    flex-direction: column;
+    transform: none !important;
+    gap: 32px;
+  }
+  .evidence-section .case-card {
+    width: 100% !important;
+    padding: 0 20px !important;
+    filter: none !important;
+    opacity: 1 !important;
+  }
+}
+
 @media (hover: hover) and (pointer: fine) {
   body {
     cursor: none;
