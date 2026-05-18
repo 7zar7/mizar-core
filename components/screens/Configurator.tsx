@@ -206,8 +206,13 @@ export function Configurator() {
   return (
     <section
       id="configurator"
-      className="relative flex min-h-screen w-full items-center justify-center py-28"
-      style={{ background: "#f0f0f2" }}
+      className="flex min-h-screen w-full items-center justify-center py-28"
+      style={{
+        background: "#f0f0f2",
+        position: "relative",
+        zIndex: 10,
+        isolation: "isolate",
+      }}
     >
       <SectionTag n="04" />
       <div className="w-full px-6">

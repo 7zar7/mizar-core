@@ -36,10 +36,10 @@ export function Nav() {
 
       <a
         href="#configurator"
-        className="btn-dark"
-        style={{ padding: "8px 16px", fontSize: 12 }}
+        className="btn-urgent"
+        style={{ padding: "9px 18px" }}
       >
-        [ LOCK A SLOT ]
+        GET YOUR SITE IN 5 DAYS
       </a>
     </header>
   );

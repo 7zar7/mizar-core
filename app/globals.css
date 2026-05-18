@@ -117,6 +117,43 @@ body {
     transition: transform 0.45s ease;
   }
 
+  .btn-urgent {
+    position: relative;
+    overflow: hidden;
+    background: #c41e0e;
+    color: #fff;
+    font-family: var(--font-jetbrains), ui-monospace, monospace;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    border-radius: 2px;
+    border: 1px solid #c41e0e;
+    cursor: pointer;
+    transition: filter 0.2s ease;
+  }
+
+  .btn-urgent:hover {
+    filter: brightness(1.1);
+  }
+
+  .btn-urgent::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-110%);
+    background: linear-gradient(
+      100deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.28) 50%,
+      transparent 100%
+    );
+  }
+
+  .btn-urgent:hover::after {
+    transform: translateX(110%);
+    transition: transform 0.5s ease;
+  }
+
   .btn-deploy {
     border-color: #1a1a1e;
     transition:

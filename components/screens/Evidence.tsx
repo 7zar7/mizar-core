@@ -222,9 +222,23 @@ function CardBody({ c }: { c: CaseStudy }) {
 function CardInner({ c }: { c: CaseStudy }) {
   return (
     <GlassCard
-      className="max-h-full w-full overflow-hidden rounded-[6px]"
-      style={{ padding: 0 }}
+      className="max-h-full w-full overflow-hidden"
+      style={{ padding: 0, borderRadius: "4px 0px 24px 0px" }}
     >
+      {/* folded-corner mark — classified-document feel */}
+      <span
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: 0,
+          right: 0,
+          width: 16,
+          height: 16,
+          background: "#c41e0e",
+          clipPath: "polygon(100% 0, 0 0, 100% 100%)",
+          zIndex: 3,
+        }}
+      />
       <div style={{ height: 220, width: "100%" }}>
         {c.kind === "live" && c.link ? (
           <LiveShot url={c.link} metric={c.metric} />
