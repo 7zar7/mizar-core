@@ -14,6 +14,7 @@ import { SectionTag } from "../SectionTag";
 type CaseStudy = {
   n: string;
   flag: string;
+  city: string;
   kind: "live" | "nda";
   industry: string;
   company: string;
@@ -28,6 +29,7 @@ const CASES: CaseStudy[] = [
   {
     n: "01",
     flag: "🇪🇸",
+    city: "BARCELONA",
     kind: "live",
     industry: "LOCAL BUSINESS",
     company: "MENSLAB BCN",
@@ -40,6 +42,7 @@ const CASES: CaseStudy[] = [
   {
     n: "02",
     flag: "🇨🇦",
+    city: "TORONTO",
     kind: "live",
     industry: "LEGAL SAAS",
     company: "CLEARSIGN",
@@ -52,6 +55,7 @@ const CASES: CaseStudy[] = [
   {
     n: "03",
     flag: "🇮🇹",
+    city: "MILAN",
     kind: "live",
     industry: "LIFESTYLE EDITORIAL",
     company: "MILAN DECODED",
@@ -64,6 +68,7 @@ const CASES: CaseStudy[] = [
   {
     n: "04",
     flag: "🇺🇸",
+    city: "NEW YORK",
     kind: "nda",
     industry: "COMPETITIVE INTELLIGENCE",
     company: "MATCH GROUP",
@@ -75,6 +80,7 @@ const CASES: CaseStudy[] = [
   {
     n: "05",
     flag: "🇺🇸",
+    city: "NEW YORK",
     kind: "nda",
     industry: "AD MONETIZATION",
     company: "SPARK",
@@ -86,6 +92,7 @@ const CASES: CaseStudy[] = [
   {
     n: "06",
     flag: "🇺🇸",
+    city: "NEW YORK",
     kind: "nda",
     industry: "MARKET RESEARCH",
     company: "PERSONAL STYLING CO.",
@@ -257,6 +264,32 @@ function CardInner({ c }: { c: CaseStudy }) {
           zIndex: 3,
         }}
       />
+      {/* prominent origin marker — flag + city, top-left */}
+      <div
+        style={{
+          position: "absolute",
+          top: 16,
+          left: 18,
+          zIndex: 4,
+          pointerEvents: "none",
+        }}
+      >
+        <span style={{ display: "block", fontSize: 28, lineHeight: 1 }}>
+          {c.flag}
+        </span>
+        <span
+          className="mono"
+          style={{
+            display: "block",
+            marginTop: 4,
+            fontSize: 9,
+            letterSpacing: "0.2em",
+            color: "var(--text-muted)",
+          }}
+        >
+          {c.city}
+        </span>
+      </div>
       <div style={{ height: 220, width: "100%" }}>
         {c.kind === "live" && c.link ? (
           <LiveShot url={c.link} metric={c.metric} />
@@ -264,14 +297,14 @@ function CardInner({ c }: { c: CaseStudy }) {
           <DarkMetric metric={c.metric} />
         )}
       </div>
-      {/* case-number watermark + country flag */}
+      {/* case-number watermark (flag now lives top-left) */}
       <span
         aria-hidden
         className="mono"
         style={{
           position: "absolute",
           bottom: 10,
-          right: 22,
+          right: 14,
           fontSize: 80,
           fontWeight: 900,
           lineHeight: 1,
@@ -282,7 +315,7 @@ function CardInner({ c }: { c: CaseStudy }) {
           zIndex: 0,
         }}
       >
-        {c.n} {c.flag}
+        {c.n}
       </span>
       <div style={{ position: "relative", zIndex: 1 }}>
         <CardBody c={c} />
