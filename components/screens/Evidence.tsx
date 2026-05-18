@@ -1,7 +1,15 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import gsap from "gsap";
 import { SectionTag } from "../SectionTag";
+
+const CARD_H = 420;
+
+const shot = (url: string) =>
+  `https://s.wordpress.com/mshots/v1/${encodeURIComponent(
+    `https://${url}`,
+  )}?w=1000`;
 
 type CaseStudy = {
   n: string;
@@ -127,80 +135,45 @@ const CASES: CaseStudy[] = [
   },
 ];
 
-const TAG = (t: string) => (
-  <span
-    key={t}
-    className="mono"
-    style={{
-      fontSize: 10,
-      letterSpacing: "0.12em",
-      color: "var(--text-secondary)",
-      border: "1px solid var(--border)",
-      borderRadius: 999,
-      padding: "5px 12px",
-    }}
-  >
-    {t}
-  </span>
-);
 
-/** FRONT — dark metric header (40%) + light identity body (60%). */
-function FrontFace({ c }: { c: CaseStudy }) {
-  const dark = c.kind === "nda";
+const CARD_RADIUS = "4px 0px 24px 0px";
+
+/** PREVIEW (front) — readable state before hover. */
+function Preview({ c }: { c: CaseStudy }) {
+  const live = c.kind === "live";
   return (
     <div
-      className="flex h-full w-full flex-col overflow-hidden"
+      className="relative flex h-full w-full flex-col justify-end overflow-hidden"
       style={{
-        borderRadius: "4px 0px 24px 0px",
-        border: dark
-          ? "1px solid rgba(196,30,14,0.3)"
-          : "1px solid rgba(228,228,231,0.8)",
-        boxShadow: "0 8px 40px rgba(0,0,0,0.06)",
+        borderRadius: CARD_RADIUS,
+        background: "#1A1A1E",
+        border: live
+          ? "1px solid rgba(228,228,231,0.5)"
+          : "1px solid rgba(196,30,14,0.3)",
       }}
     >
-      {/* dark header — metric visible immediately */}
-      <div
-        className="relative flex shrink-0 items-center"
-        style={{ height: "40%", background: "#1A1A1E", padding: "0 24px" }}
-      >
-        <span
-          className="mono"
-          style={{
-            fontSize: 48,
-            fontWeight: 700,
-            color: "#C41E0E",
-            lineHeight: 1,
-            letterSpacing: "-0.02em",
-          }}
-        >
-          {c.metric}
-        </span>
-        <span
-          className="mono"
-          style={{
-            position: "absolute",
-            top: 14,
-            right: 16,
-            fontSize: 11,
-            color: "rgba(255,255,255,0.25)",
-            letterSpacing: "0.1em",
-          }}
-        >
-          {c.n}
-        </span>
-      </div>
+      {live && c.link ? (
+        <>
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              inset: 0,
+              backgroundImage: `url("${shot(c.link)}")`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          />
+          <div
+            aria-hidden
+            style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.45)" }}
+          />
+        </>
+      ) : null}
 
-      {/* light identity body */}
       <div
-        className="flex min-h-0 flex-1 flex-col"
-        style={{
-          padding: 24,
-          background: dark
-            ? "rgba(26,26,30,0.92)"
-            : "rgba(255,255,255,0.72)",
-          WebkitBackdropFilter: "blur(30px) saturate(120%)",
-          backdropFilter: "blur(30px) saturate(120%)",
-        }}
+        className="relative flex items-start justify-between"
+        style={{ padding: "20px 24px 0" }}
       >
         <div className="flex items-center gap-2">
           <span style={{ fontSize: 22, lineHeight: 1 }}>{c.flag}</span>
@@ -209,17 +182,42 @@ function FrontFace({ c }: { c: CaseStudy }) {
             style={{
               fontSize: 9,
               letterSpacing: "0.2em",
-              color: dark ? "rgba(255,255,255,0.4)" : "var(--text-muted)",
+              color: "rgba(255,255,255,0.55)",
             }}
           >
             {c.city}
           </span>
         </div>
+        <span
+          className="mono"
+          style={{
+            fontSize: 11,
+            color: "rgba(255,255,255,0.3)",
+            letterSpacing: "0.1em",
+          }}
+        >
+          {c.n}
+        </span>
+      </div>
+
+      <div className="relative mt-auto" style={{ padding: "0 24px 24px" }}>
+        <div
+          className="mono"
+          style={{
+            fontSize: live ? 40 : 52,
+            fontWeight: 700,
+            color: "#C41E0E",
+            lineHeight: 1,
+            letterSpacing: "-0.02em",
+          }}
+        >
+          {c.metric}
+        </div>
         <p
           style={{
-            color: dark ? "rgba(255,255,255,0.6)" : "var(--text-secondary)",
+            color: "rgba(255,255,255,0.65)",
             fontSize: 13,
-            marginTop: 10,
+            marginTop: 6,
           }}
         >
           {c.metricLabel}
@@ -229,39 +227,245 @@ function FrontFace({ c }: { c: CaseStudy }) {
           style={{
             fontSize: 16,
             fontWeight: 700,
+            color: "#fff",
             letterSpacing: "0.02em",
-            marginTop: 8,
-            color: dark ? "#fff" : "var(--text-primary)",
+            marginTop: 10,
           }}
         >
           {c.company}
         </p>
-        <div className="mt-auto flex flex-wrap gap-2" style={{ paddingTop: 12 }}>
-          {c.tags.map(TAG)}
+        <div className="mt-3 flex flex-wrap gap-2">
+          {c.tags.map((t) => (
+            <span
+              key={t}
+              className="mono"
+              style={{
+                fontSize: 10,
+                letterSpacing: "0.12em",
+                color: "rgba(255,255,255,0.8)",
+                border: "1px solid rgba(255,255,255,0.3)",
+                borderRadius: 999,
+                padding: "4px 11px",
+              }}
+            >
+              {t}
+            </span>
+          ))}
         </div>
       </div>
     </div>
   );
 }
 
-/* Cards are now fully static (no flip / no back face). */
-
-/** Fully static card — front face only, no hover animation. */
-function StaticCard({ c }: { c: CaseStudy }) {
-  const big = c.kind === "live";
+/** BACK — revealed after the flip. */
+function Back({ c }: { c: CaseStudy }) {
+  const lines = (c.backLines ?? [c.desc]).slice(0, 2);
   return (
     <div
+      className="flex h-full w-full flex-col overflow-hidden"
+      style={{
+        borderRadius: CARD_RADIUS,
+        background: "#1A1A1E",
+        border: "1px solid rgba(196,30,14,0.3)",
+        padding: 24,
+      }}
+    >
+      <p
+        className="mono"
+        style={{
+          fontSize: 14,
+          fontWeight: 700,
+          color: "#fff",
+          letterSpacing: "0.04em",
+        }}
+      >
+        {c.company}
+      </p>
+      <p
+        style={{
+          color: "rgba(255,255,255,0.7)",
+          fontSize: 13,
+          lineHeight: 1.5,
+          marginTop: 10,
+        }}
+      >
+        {c.desc}
+      </p>
+      <div className="mt-4 flex flex-col gap-1.5">
+        {lines.map((l) => (
+          <p
+            key={l}
+            className="mono"
+            style={{ color: "rgba(255,255,255,0.55)", fontSize: 11 }}
+          >
+            ▸ {l}
+          </p>
+        ))}
+      </div>
+      <div className="mt-auto" style={{ paddingTop: 14 }}>
+        {c.kind === "nda" ? (
+          <p
+            className="mono"
+            style={{
+              fontSize: 10,
+              fontStyle: "italic",
+              color: "rgba(255,255,255,0.4)",
+            }}
+          >
+            Scope anonymized per NDA
+          </p>
+        ) : (
+          <a
+            href={`https://${c.link}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-cursor
+            className="mono"
+            style={{
+              fontSize: 12,
+              color: "#c41e0e",
+              borderBottom: "1px solid #c41e0e",
+              paddingBottom: 2,
+              wordBreak: "break-all",
+            }}
+          >
+            {c.link} ↗
+          </a>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Railway split-flap card. The card is 4 horizontal strips; each
+ * strip has a front (preview slice) and back (detail slice) and
+ * flips independently, staggered top→bottom on enter and
+ * bottom→top on leave, with a brief panel "click" flash.
+ */
+function RailwayCard({ c }: { c: CaseStudy }) {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const inners = useRef<(HTMLDivElement | null)[]>([]);
+  const flashes = useRef<(HTMLDivElement | null)[]>([]);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const isDesktop = () =>
+      window.matchMedia(
+        "(min-width: 768px) and (prefers-reduced-motion: no-preference)",
+      ).matches;
+
+    const run = (to: number) => {
+      const order = to === -180 ? [0, 1, 2, 3] : [3, 2, 1, 0];
+      order.forEach((idx, pos) => {
+        const inner = inners.current[idx];
+        const flash = flashes.current[idx];
+        if (!inner) return;
+        gsap.to(inner, {
+          rotationX: to,
+          duration: 0.2,
+          ease: "power2.inOut",
+          delay: pos * 0.06,
+          overwrite: true,
+        });
+        if (flash)
+          gsap
+            .timeline({ delay: pos * 0.06 + 0.085 })
+            .set(flash, { opacity: 0.75 })
+            .to(flash, { opacity: 0, duration: 0.03, ease: "none" });
+      });
+    };
+
+    const onEnter = () => {
+      if (isDesktop()) run(-180);
+    };
+    const onLeave = () => {
+      if (isDesktop()) run(0);
+    };
+    root.addEventListener("mouseenter", onEnter);
+    root.addEventListener("mouseleave", onLeave);
+    return () => {
+      root.removeEventListener("mouseenter", onEnter);
+      root.removeEventListener("mouseleave", onLeave);
+    };
+  }, []);
+
+  return (
+    <div
+      ref={rootRef}
       className="flip-card relative"
       data-cursor
       style={{
-        gridRow: big ? "span 2" : "span 1",
-        height: "100%",
-        minHeight: big ? 472 : 228,
+        height: CARD_H,
+        minHeight: CARD_H,
         minWidth: 0,
         willChange: "filter",
       }}
     >
-      <FrontFace c={c} />
+      {[0, 1, 2, 3].map((i) => (
+        <div
+          key={i}
+          className="absolute inset-x-0 overflow-hidden"
+          style={{ top: `${i * 25}%`, height: "25%", perspective: 900 }}
+        >
+          <div
+            ref={(el) => {
+              inners.current[i] = el;
+            }}
+            style={{
+              position: "absolute",
+              inset: 0,
+              transformStyle: "preserve-3d",
+              willChange: "transform",
+            }}
+          >
+            <div
+              className="absolute inset-0 overflow-hidden"
+              style={{ backfaceVisibility: "hidden" }}
+            >
+              <div
+                style={{
+                  position: "absolute",
+                  left: 0,
+                  right: 0,
+                  height: "400%",
+                  top: `${-i * 100}%`,
+                }}
+              >
+                <Preview c={c} />
+              </div>
+            </div>
+            <div
+              className="absolute inset-0 overflow-hidden"
+              style={{
+                backfaceVisibility: "hidden",
+                transform: "rotateX(180deg)",
+              }}
+            >
+              <div
+                style={{
+                  position: "absolute",
+                  left: 0,
+                  right: 0,
+                  height: "400%",
+                  top: `${-i * 100}%`,
+                }}
+              >
+                <Back c={c} />
+              </div>
+            </div>
+          </div>
+          <div
+            ref={(el) => {
+              flashes.current[i] = el;
+            }}
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{ background: "#E4E4E7", opacity: 0 }}
+          />
+        </div>
+      ))}
     </div>
   );
 }
@@ -345,12 +549,12 @@ export function Evidence() {
           style={{
             display: "grid",
             gap: 16,
-            gridAutoRows: 228,
-            gridAutoFlow: "dense",
+            gridAutoRows: "auto",
+            paddingBottom: 48,
           }}
         >
           {CASES.map((c) => (
-            <StaticCard key={c.n} c={c} />
+            <RailwayCard key={c.n} c={c} />
           ))}
         </div>
       </div>

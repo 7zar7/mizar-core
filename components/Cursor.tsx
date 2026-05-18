@@ -46,22 +46,32 @@ export function Cursor() {
     const leave = () => setVisible(false);
     const dn = () => setDown(true);
     const up = () => setDown(false);
+    const onBlur = () => setVisible(false);
+    const onFocus = () => setVisible(true);
+    const onOut = (e: Event) => {
+      if (!(e as PointerEvent).relatedTarget) setHover(false);
+    };
 
     window.addEventListener("pointermove", move, { passive: true });
     window.addEventListener("pointerover", over, { passive: true });
-    window.addEventListener("pointerout", (e) => {
-      if (!(e as PointerEvent).relatedTarget) setHover(false);
-    });
+    window.addEventListener("pointerout", onOut);
     document.addEventListener("pointerleave", leave);
     window.addEventListener("pointerdown", dn);
     window.addEventListener("pointerup", up);
+    window.addEventListener("blur", onBlur);
+    window.addEventListener("focus", onFocus);
     return () => {
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerover", over);
+      window.removeEventListener("pointerout", onOut);
       document.removeEventListener("pointerleave", leave);
       window.removeEventListener("pointerdown", dn);
       window.removeEventListener("pointerup", up);
+      window.removeEventListener("blur", onBlur);
+      window.removeEventListener("focus", onFocus);
       if (raf) cancelAnimationFrame(raf);
+      // restore the native cursor if the overlay is unmounted
+      document.body.style.cursor = "auto";
     };
   }, [isMobile]);
 

@@ -87,48 +87,53 @@ export function Manifesto() {
             style={{
               ...willAnim,
               display: "inline-flex",
-              alignItems: "center",
+              alignItems: "baseline",
             }}
           >
             <span className="mizar-mi">MI</span>
+            {/* Z as SVG (for animation) sized to the text cap-height */}
             <svg
               className="z-char"
               viewBox="0 0 60 80"
-              width="0.7em"
-              height="1em"
-              style={{ display: "block", overflow: "visible" }}
+              width="0.62em"
+              height="0.72em"
+              style={{
+                display: "block",
+                overflow: "visible",
+                alignSelf: "baseline",
+              }}
               aria-hidden
             >
               <line
                 className="z-top"
-                x1="5"
-                y1="8"
-                x2="55"
-                y2="8"
+                x1="4"
+                y1="6"
+                x2="56"
+                y2="6"
                 stroke="#18181B"
-                strokeWidth="6"
-                strokeLinecap="square"
+                strokeWidth="3.4"
+                strokeLinecap="butt"
                 style={{ transformOrigin: "center", transformBox: "fill-box" }}
               />
               <line
                 className="z-diagonal"
-                x1="55"
-                y1="8"
-                x2="5"
-                y2="72"
+                x1="56"
+                y1="6"
+                x2="4"
+                y2="74"
                 stroke="#18181B"
-                strokeWidth="6"
-                strokeLinecap="square"
+                strokeWidth="3.4"
+                strokeLinecap="butt"
               />
               <line
                 className="z-bottom"
-                x1="5"
-                y1="72"
-                x2="55"
-                y2="72"
+                x1="4"
+                y1="74"
+                x2="56"
+                y2="74"
                 stroke="#18181B"
-                strokeWidth="6"
-                strokeLinecap="square"
+                strokeWidth="3.4"
+                strokeLinecap="butt"
                 style={{ transformOrigin: "center", transformBox: "fill-box" }}
               />
             </svg>
