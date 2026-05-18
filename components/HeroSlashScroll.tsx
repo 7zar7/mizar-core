@@ -50,6 +50,8 @@ export function HeroSlashScroll() {
     const q = <T extends Element>(s: string) =>
       document.querySelector<T>(s);
     const mizar = q<HTMLElement>(".mizar-word");
+    const mi = q<HTMLElement>(".mizar-mi");
+    const ar = q<HTMLElement>(".mizar-ar");
     const core = q<HTMLElement>(".core-word");
     const slashes = q<HTMLElement>(".logo-slashes");
     const line = q<HTMLElement>(".scramble-line");
@@ -67,7 +69,7 @@ export function HeroSlashScroll() {
           if (window.matchMedia("(pointer: coarse)").matches) {
             ScrollTrigger.normalizeScroll(true);
           }
-          gsap.set(".laser-line", { autoAlpha: 0 });
+          gsap.set([".laser-line", ".z-laser"], { autoAlpha: 0 });
 
           // P2 — idle mouse parallax (inertial lerp 0.06, ±15px)
           const mizarX = gsap.quickSetter(".mizar-word", "x", "px");
@@ -118,17 +120,28 @@ export function HeroSlashScroll() {
                 refreshPriority: 3,
               },
             })
+            // MI / AR fly outward + blur (the Z stays behind)
             .to(
-              ".mizar-word",
+              ".mizar-mi",
               {
-                x: -600,
-                scale: 3.5,
+                x: -400,
                 opacity: 0,
-                filter: "blur(15px)",
+                filter: "blur(12px)",
                 duration: 1,
                 ease: "none",
               },
               0,
+            )
+            .to(
+              ".mizar-ar",
+              {
+                x: 400,
+                opacity: 0,
+                filter: "blur(12px)",
+                duration: 1,
+                ease: "none",
+              },
+              0.05,
             )
             .to(
               ".core-word",
@@ -137,6 +150,25 @@ export function HeroSlashScroll() {
                 scale: 3.5,
                 opacity: 0,
                 filter: "blur(15px)",
+                duration: 1,
+                ease: "none",
+              },
+              0,
+            )
+            // Z top + bottom dissolve from the centre
+            .to(
+              [".z-top", ".z-bottom"],
+              { scaleX: 0, opacity: 0, duration: 0.3, ease: "none" },
+              0,
+            )
+            // Z diagonal straightens + stretches into the red centre line
+            .to(
+              ".z-diagonal",
+              {
+                attr: { x1: 30, x2: 30, "stroke-width": 1.5 },
+                stroke: "#C41E0E",
+                scaleY: 34,
+                svgOrigin: "30 40",
                 duration: 1,
                 ease: "none",
               },
@@ -156,6 +188,11 @@ export function HeroSlashScroll() {
               ".laser-line",
               { autoAlpha: 1, duration: 0.25, ease: "none" },
               0.75,
+            )
+            .to(
+              ".z-laser",
+              { autoAlpha: 0.4, duration: 0.25, ease: "none" },
+              0.75,
             );
 
           ScrollTrigger.refresh();
@@ -171,6 +208,7 @@ export function HeroSlashScroll() {
 
       mm.add("(max-width: 767px), (prefers-reduced-motion: reduce)", () => {
         gsap.set(".laser-line", { autoAlpha: 1 });
+        gsap.set(".z-laser", { autoAlpha: 0 });
         gsap.set(".mizar-word, .core-word, .logo-slashes", { opacity: 1 });
       });
 
@@ -182,15 +220,9 @@ export function HeroSlashScroll() {
     // ── reduced motion → final state, no intro, no scroll lock ────
     if (reduced) {
       if (line) line.style.display = "none";
-      if (mizar) {
-        mizar.textContent = "MIZAR";
-        gsap.set(mizar, { opacity: 1, color: "#18181B" });
-      }
-      if (core) {
-        core.textContent = "CORE";
-        gsap.set(core, { opacity: 1, color: "#18181B" });
-      }
+      gsap.set([mizar, core], { opacity: 1, color: "#18181B" });
       gsap.set(slashes, { opacity: 1, scale: 1, rotation: 15 });
+      gsap.set(".z-laser", { autoAlpha: 0 });
       setupInteractions();
       return () => cleanups.forEach((c) => c());
     }
@@ -238,6 +270,7 @@ export function HeroSlashScroll() {
     );
 
     // P2 — brand decryption (600-1200ms)
+    let killA: (() => void) | undefined;
     timers.push(
       window.setTimeout(() => {
         if (line) line.style.display = "none";
@@ -247,7 +280,8 @@ export function HeroSlashScroll() {
           { color: "#C41E0E" },
           { color: "#18181B", duration: 0.6, ease: "none" },
         );
-        if (mizar) killM = scramble(mizar, "MIZAR", 600);
+        if (mi) killM = scramble(mi, "MI", 600);
+        if (ar) killA = scramble(ar, "AR", 600);
         if (core) killC = scramble(core, "CORE", 600);
       }, 600),
     );
@@ -265,6 +299,7 @@ export function HeroSlashScroll() {
       window.clearInterval(chaos);
       timers.forEach((t) => window.clearTimeout(t));
       killM?.();
+      killA?.();
       killC?.();
       html.style.overflow = prevHtml;
       document.body.style.overflow = prevBody;

@@ -23,16 +23,19 @@ function Tooltip({ show, label }: { show: boolean; label: string }) {
         position: "absolute",
         bottom: "calc(100% + 8px)",
         left: "50%",
-        transform: "translateX(-50%)",
         whiteSpace: "nowrap",
-        fontSize: 10,
+        fontSize: 9,
         letterSpacing: "0.12em",
         color: "#fff",
         background: "#1a1a1e",
-        padding: "5px 9px",
+        padding: "4px 8px",
         borderRadius: 2,
         opacity: show ? 1 : 0,
-        transition: "opacity 150ms ease",
+        transform: show
+          ? "translate(-50%, 0)"
+          : "translate(-50%, 4px)",
+        transition:
+          "opacity 150ms ease-out, transform 150ms ease-out",
         pointerEvents: "none",
       }}
     >
@@ -41,8 +44,7 @@ function Tooltip({ show, label }: { show: boolean; label: string }) {
   );
 }
 
-/** A clickable live-site teaser. Placeholder-first, swaps to a real
- *  screenshot only once it actually loads (never looks broken). */
+/** Clickable live-site teaser. Per-element blur so hover can clear it. */
 function Thumb({
   href,
   src,
@@ -77,14 +79,21 @@ function Thumb({
       data-cursor
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      className="pointer-events-auto absolute block"
+      className="blur-fragment absolute block"
       style={{
         top,
         [side]: "2.5vw",
+        pointerEvents: "auto",
+        cursor: "pointer",
+        opacity: hover ? 1 : 0.7,
+        filter: hover ? "blur(0px)" : "blur(3px)",
+        transform: hover ? "scale(1.05)" : "scale(1)",
+        transition:
+          "filter 200ms ease-out, opacity 200ms ease-out, transform 200ms ease-out",
         animation: `${drift} 16s ease-in-out infinite`,
       }}
     >
-      <Tooltip show={hover} label={`${name} — live`} />
+      <Tooltip show={hover} label="View live site ↗" />
       <span
         className="block overflow-hidden"
         style={{
@@ -93,12 +102,11 @@ function Thumb({
           borderRadius: 4,
           border: "1px solid rgba(255,255,255,0.9)",
           background: "#1a1a1e",
-          filter: hover ? "blur(0px)" : "blur(2px)",
           boxShadow: hover
             ? "0 12px 40px rgba(0,0,0,0.22)"
             : "0 4px 16px rgba(0,0,0,0.08)",
           transition:
-            "width 200ms ease-out, height 200ms ease-out, filter 200ms ease-out, box-shadow 200ms ease-out",
+            "width 200ms ease-out, height 200ms ease-out, box-shadow 200ms ease-out",
           position: "relative",
         }}
       >
@@ -139,30 +147,14 @@ type Frag = {
   kind: "metric" | "tag" | "date";
   text: string;
   tip: string;
+  href: string;
   top: string;
   off: string;
   drift: "drift-a" | "drift-b";
 };
 
-function Fragment({
-  f,
-  side,
-  href,
-}: {
-  f: Frag;
-  side: "left" | "right";
-  href: string;
-}) {
+function Fragment({ f, side }: { f: Frag; side: "left" | "right" }) {
   const [hover, setHover] = useState(false);
-  const base: React.CSSProperties = {
-    position: "absolute",
-    top: f.top,
-    [side]: f.off,
-    filter: hover ? "blur(0px)" : "blur(3px)",
-    transform: hover ? "scale(1.05)" : "scale(1)",
-    transition: "filter 200ms ease-out, transform 200ms ease-out",
-    animation: `${f.drift} 18s ease-in-out infinite`,
-  };
 
   const inner =
     f.kind === "metric" ? (
@@ -203,14 +195,26 @@ function Fragment({
 
   return (
     <a
-      href={href}
+      href={f.href}
       target="_blank"
       rel="noopener noreferrer"
       data-cursor
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      className="pointer-events-auto block"
-      style={base}
+      className="blur-fragment block"
+      style={{
+        position: "absolute",
+        top: f.top,
+        [side]: f.off,
+        pointerEvents: "auto",
+        cursor: "pointer",
+        opacity: hover ? 1 : 0.7,
+        filter: hover ? "blur(0px)" : "blur(3px)",
+        transform: hover ? "scale(1.05)" : "scale(1)",
+        transition:
+          "filter 200ms ease-out, opacity 200ms ease-out, transform 200ms ease-out",
+        animation: `${f.drift} 18s ease-in-out infinite`,
+      }}
     >
       <Tooltip show={hover} label={f.tip} />
       {inner}
@@ -222,7 +226,8 @@ const LEFT_FRAGS: Frag[] = [
   {
     kind: "metric",
     text: "$12.85M",
-    tip: "MATCH GROUP — expansion identified",
+    tip: "Match Group · Competitive Intel",
+    href: "#evidence",
     top: "20%",
     off: "3vw",
     drift: "drift-b",
@@ -231,6 +236,7 @@ const LEFT_FRAGS: Frag[] = [
     kind: "tag",
     text: "[LEGALTECH]",
     tip: "Strategic engagement vertical",
+    href: "#evidence",
     top: "62%",
     off: "5vw",
     drift: "drift-a",
@@ -238,7 +244,8 @@ const LEFT_FRAGS: Frag[] = [
   {
     kind: "date",
     text: "2026.02",
-    tip: "MATCH GROUP — delivery window",
+    tip: "Match Group — delivery window",
+    href: "#evidence",
     top: "78%",
     off: "2.5vw",
     drift: "drift-b",
@@ -249,7 +256,8 @@ const RIGHT_FRAGS: Frag[] = [
   {
     kind: "metric",
     text: "$1.46B",
-    tip: "PERSONAL STYLING CO. — market sized",
+    tip: "Personal Styling · Market Research",
+    href: "#evidence",
     top: "22%",
     off: "3vw",
     drift: "drift-a",
@@ -258,6 +266,7 @@ const RIGHT_FRAGS: Frag[] = [
     kind: "tag",
     text: "[FINTECH]",
     tip: "Strategic engagement vertical",
+    href: "#evidence",
     top: "68%",
     off: "5vw",
     drift: "drift-b",
@@ -266,6 +275,7 @@ const RIGHT_FRAGS: Frag[] = [
     kind: "date",
     text: "2026.04",
     tip: "SPARK — delivery window",
+    href: "#evidence",
     top: "84%",
     off: "2.5vw",
     drift: "drift-a",
@@ -273,10 +283,10 @@ const RIGHT_FRAGS: Frag[] = [
 ];
 
 /**
- * Structural DNA: two SOLID vertical laser lines at 28vw / 72vw.
- * Outer zones carry the anamorphic blur; an edge sensor pulls the zone
- * into focus on hover. Live-site thumbnails + discovery fragments float
- * inside the zones — never overlapping the centre content.
+ * Structural DNA: two SOLID vertical laser lines at 28vw / 72vw, kept
+ * BEHIND content (z-0). The floating thumbnails + discovery fragments
+ * live in a separate layer ABOVE content so they stay hoverable and
+ * clickable; each carries its own blur (cleared on hover).
  */
 export function LaserSystem() {
   const { pulseKey, isMobile } = useSite();
@@ -291,51 +301,53 @@ export function LaserSystem() {
     right.start({ ...ripple, transition: t });
   }, [pulseKey, left, right]);
 
-  const zoneBase: React.CSSProperties = {
-    background: "rgba(245,245,247,0.12)",
-    transition:
-      "backdrop-filter 200ms ease-out, -webkit-backdrop-filter 200ms ease-out",
-  };
-
   return (
-    <div
-      aria-hidden
-      className="pointer-events-none fixed inset-0 z-0"
-      style={{ contain: "strict" }}
-    >
-      {!isMobile && (
-        <>
-          <div
-            className="absolute inset-y-0 left-0"
-            style={{
-              ...zoneBase,
-              width: "var(--laser-left)",
-              backdropFilter: "blur(3px)",
-              WebkitBackdropFilter: "blur(3px)",
-              maskImage:
-                "linear-gradient(to right, black 0%, black 70%, transparent 100%)",
-              WebkitMaskImage:
-                "linear-gradient(to right, black 0%, black 70%, transparent 100%)",
-            }}
-          />
-          <div
-            className="absolute inset-y-0 right-0"
-            style={{
-              ...zoneBase,
-              width: "calc(100vw - var(--laser-right))",
-              backdropFilter: "blur(3px)",
-              WebkitBackdropFilter: "blur(3px)",
-              maskImage:
-                "linear-gradient(to left, black 0%, black 70%, transparent 100%)",
-              WebkitMaskImage:
-                "linear-gradient(to left, black 0%, black 70%, transparent 100%)",
-            }}
-          />
+    <>
+      {/* structural lines — behind content */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 z-0"
+        style={{ contain: "strict" }}
+      >
+        <motion.span
+          animate={left}
+          className="laser-line absolute inset-y-0"
+          style={{
+            left: "var(--laser-left)",
+            width: 1,
+            background: "var(--border)",
+          }}
+        />
+        <motion.span
+          animate={right}
+          className="laser-line absolute inset-y-0"
+          style={{
+            left: "var(--laser-right)",
+            width: 1,
+            background: "var(--border)",
+          }}
+        />
+        {/* the Z, made structural — center red line (ghost of the Z) */}
+        <span
+          className="z-laser absolute inset-y-0"
+          style={{
+            left: "50%",
+            width: 1,
+            background: "#C41E0E",
+            opacity: 0,
+          }}
+        />
+      </div>
 
-          {/* LEFT zone — interactive items only, edge-constrained (<22vw) */}
+      {/* interactive teasers — above content, edge-constrained */}
+      {!isMobile && (
+        <div
+          className="pointer-events-none fixed inset-0 z-[40]"
+          aria-hidden
+        >
           <div
             className="absolute inset-y-0 left-0"
-            style={{ width: "22vw", pointerEvents: "none" }}
+            style={{ width: "22vw" }}
           >
             <Thumb
               href="https://menslab-barbershop-wedq.vercel.app/"
@@ -347,19 +359,13 @@ export function LaserSystem() {
               side="left"
             />
             {LEFT_FRAGS.map((f) => (
-              <Fragment
-                key={f.text}
-                f={f}
-                side="left"
-                href="#evidence"
-              />
+              <Fragment key={f.text} f={f} side="left" />
             ))}
           </div>
 
-          {/* RIGHT zone — interactive items only, edge-constrained */}
           <div
             className="absolute inset-y-0 right-0"
-            style={{ width: "22vw", pointerEvents: "none" }}
+            style={{ width: "22vw" }}
           >
             <Thumb
               href="https://milan-decoded.vercel.app/"
@@ -371,27 +377,11 @@ export function LaserSystem() {
               side="right"
             />
             {RIGHT_FRAGS.map((f) => (
-              <Fragment
-                key={f.text}
-                f={f}
-                side="right"
-                href="#evidence"
-              />
+              <Fragment key={f.text} f={f} side="right" />
             ))}
           </div>
-        </>
+        </div>
       )}
-
-      <motion.span
-        animate={left}
-        className="laser-line absolute inset-y-0"
-        style={{ left: "var(--laser-left)", width: 1, background: "var(--border)" }}
-      />
-      <motion.span
-        animate={right}
-        className="laser-line absolute inset-y-0"
-        style={{ left: "var(--laser-right)", width: 1, background: "var(--border)" }}
-      />
-    </div>
+    </>
   );
 }

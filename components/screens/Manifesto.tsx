@@ -84,9 +84,55 @@ export function Manifesto() {
         >
           <span
             className="logo-text-left mizar-word text-text-primary"
-            style={willAnim}
+            style={{
+              ...willAnim,
+              display: "inline-flex",
+              alignItems: "center",
+            }}
           >
-            MIZAR
+            <span className="mizar-mi">MI</span>
+            <svg
+              className="z-char"
+              viewBox="0 0 60 80"
+              width="0.7em"
+              height="1em"
+              style={{ display: "block", overflow: "visible" }}
+              aria-hidden
+            >
+              <line
+                className="z-top"
+                x1="5"
+                y1="8"
+                x2="55"
+                y2="8"
+                stroke="#18181B"
+                strokeWidth="6"
+                strokeLinecap="square"
+                style={{ transformOrigin: "center", transformBox: "fill-box" }}
+              />
+              <line
+                className="z-diagonal"
+                x1="55"
+                y1="8"
+                x2="5"
+                y2="72"
+                stroke="#18181B"
+                strokeWidth="6"
+                strokeLinecap="square"
+              />
+              <line
+                className="z-bottom"
+                x1="5"
+                y1="72"
+                x2="55"
+                y2="72"
+                stroke="#18181B"
+                strokeWidth="6"
+                strokeLinecap="square"
+                style={{ transformOrigin: "center", transformBox: "fill-box" }}
+              />
+            </svg>
+            <span className="mizar-ar">AR</span>
           </span>
 
           <span

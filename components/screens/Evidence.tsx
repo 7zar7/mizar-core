@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import gsap from "gsap";
+import { useEffect, useRef } from "react";
 import { SectionTag } from "../SectionTag";
 
 type CaseStudy = {
@@ -128,11 +127,6 @@ const CASES: CaseStudy[] = [
   },
 ];
 
-const shot = (url: string) =>
-  `https://s.wordpress.com/mshots/v1/${encodeURIComponent(
-    `https://${url}`,
-  )}?w=1000`;
-
 const TAG = (t: string) => (
   <span
     key={t}
@@ -250,309 +244,13 @@ function FrontFace({ c }: { c: CaseStudy }) {
   );
 }
 
-function LiveShot({ url }: { url: string }) {
-  const [err, setErr] = useState(false);
-  if (err)
-    return (
-      <div
-        className="h-full w-full"
-        style={{ background: "#1a1a1e" }}
-        aria-hidden
-      />
-    );
-  return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={shot(url)}
-      alt=""
-      loading="lazy"
-      onError={() => setErr(true)}
-      style={{ width: "100%", height: "100%", objectFit: "cover" }}
-    />
-  );
-}
+/* Cards are now fully static (no flip / no back face). */
 
-const BACK_SHELL: React.CSSProperties = {
-  borderRadius: "4px 0px 24px 0px",
-  background: "#1A1A1E",
-  border: "1px solid rgba(196,30,14,0.3)",
-};
-
-/** BACK — screenshot (MensLab) or explicit dark text panel. */
-function BackFace({ c }: { c: CaseStudy }) {
-  // MensLab keeps the live screenshot
-  if (c.backType === "shot" && c.link) {
-    return (
-      <div
-        className="relative flex h-full w-full flex-col overflow-hidden"
-        style={BACK_SHELL}
-      >
-        <div className="absolute inset-0">
-          <LiveShot url={c.link} />
-        </div>
-        <div
-          className="relative mt-auto flex flex-col"
-          style={{
-            padding: 20,
-            background:
-              "linear-gradient(to top, rgba(26,26,30,0.97), rgba(26,26,30,0))",
-          }}
-        >
-          <p
-            className="mono"
-            style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}
-          >
-            {c.company}
-          </p>
-          <p
-            style={{
-              color: "rgba(255,255,255,0.72)",
-              fontSize: 13,
-              lineHeight: 1.5,
-              marginTop: 6,
-            }}
-          >
-            {c.desc}
-          </p>
-          <a
-            href={`https://${c.link}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            data-cursor
-            className="mono"
-            style={{
-              fontSize: 12,
-              color: "#c41e0e",
-              borderBottom: "1px solid #c41e0e",
-              paddingBottom: 2,
-              marginTop: 10,
-              alignSelf: "flex-start",
-              wordBreak: "break-all",
-            }}
-          >
-            {c.link} ↗
-          </a>
-        </div>
-      </div>
-    );
-  }
-
-  // explicit dark text panel (ClearSign, Milan, NDA cases)
-  const lines = c.backLines ?? [c.desc];
-  return (
-    <div
-      className="flex h-full w-full flex-col overflow-hidden"
-      style={{ ...BACK_SHELL, padding: 24 }}
-    >
-      <p
-        className="mono"
-        style={{
-          fontSize: 14,
-          fontWeight: 700,
-          color: "#fff",
-          letterSpacing: "0.04em",
-        }}
-      >
-        {c.company}
-      </p>
-      <div className="mt-3 flex flex-col gap-1.5">
-        {lines.map((l) => (
-          <p
-            key={l}
-            style={{
-              color: "rgba(255,255,255,0.72)",
-              fontSize: 13,
-              lineHeight: 1.45,
-            }}
-          >
-            {l}
-          </p>
-        ))}
-      </div>
-      <div className="mt-auto" style={{ paddingTop: 14 }}>
-        {c.kind === "nda" ? (
-          <p
-            className="mono"
-            style={{
-              fontSize: 10,
-              fontStyle: "italic",
-              color: "rgba(255,255,255,0.4)",
-            }}
-          >
-            Scope anonymized per NDA
-          </p>
-        ) : (
-          <a
-            href={`https://${c.link}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            data-cursor
-            className="mono"
-            style={{
-              fontSize: 12,
-              color: "#c41e0e",
-              borderBottom: "1px solid #c41e0e",
-              paddingBottom: 2,
-              wordBreak: "break-all",
-            }}
-          >
-            {c.link} ↗
-          </a>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function Face({ c, side }: { c: CaseStudy; side: "front" | "back" }) {
-  return side === "front" ? <FrontFace c={c} /> : <BackFace c={c} />;
-}
-
-/**
- * Split-flap flip card (railway-board effect). Card splits at the
- * midpoint; top leaf flips down, content swaps while hidden, bottom
- * leaf flips up. Crack line + shadow flash sell the mechanical click.
- */
-function FlipCard({ c }: { c: CaseStudy }) {
+/** Fully static card — front face only, no hover animation. */
+function StaticCard({ c }: { c: CaseStudy }) {
   const big = c.kind === "live";
-  const rootRef = useRef<HTMLDivElement>(null);
-  const topInner = useRef<HTMLDivElement>(null);
-  const botInner = useRef<HTMLDivElement>(null);
-  const crackRef = useRef<HTMLSpanElement>(null);
-  const [side, setSide] = useState<"front" | "back">("front");
-  const target = useRef<"front" | "back">("front");
-  const animating = useRef(false);
-
-  const flipTo = (next: "front" | "back") => {
-    if (target.current === next || animating.current) {
-      target.current = next;
-      return;
-    }
-    target.current = next;
-    animating.current = true;
-    const root = rootRef.current;
-    const crack = crackRef.current;
-
-    // Structured top-to-bottom panel reveal. Enter folds top→bottom;
-    // leave is the exact reverse (bottom→top). Same easing curve,
-    // no random timing or stagger.
-    const lead = next === "back" ? topInner.current : botInner.current;
-    const follow = next === "back" ? botInner.current : topInner.current;
-
-    gsap
-      .timeline({
-        onComplete: () => {
-          animating.current = false;
-          if (target.current !== next) flipTo(target.current);
-        },
-      })
-      .set(crack, { opacity: 1 }, 0)
-      // fold
-      .to(lead, { rotationX: -90, duration: 0.18, ease: "power2.in" }, 0)
-      .to(
-        follow,
-        { rotationX: -90, duration: 0.18, ease: "power2.in" },
-        0.08,
-      )
-      // both hidden → swap content + mechanical click flash
-      .add(() => {
-        setSide(next);
-        if (root)
-          gsap.fromTo(
-            root,
-            { boxShadow: "0 0 8px rgba(0,0,0,0.2)" },
-            { boxShadow: "0 8px 40px rgba(0,0,0,0.06)", duration: 0.12 },
-          );
-      }, 0.26)
-      // unfold
-      .to(lead, { rotationX: 0, duration: 0.2, ease: "power2.out" }, 0.27)
-      .to(
-        follow,
-        { rotationX: 0, duration: 0.2, ease: "power2.out" },
-        0.33,
-      )
-      .set(crack, { opacity: 0 }, 0.55);
-  };
-
-  useEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
-    // live check (robust to viewport changes / preview reloads)
-    const isDesktop = () =>
-      window.matchMedia(
-        "(min-width: 768px) and (prefers-reduced-motion: no-preference)",
-      ).matches;
-
-    const onEnter = () => {
-      if (isDesktop()) flipTo("back");
-    };
-    const onLeave = () => {
-      if (!isDesktop()) return;
-      flipTo("front");
-      gsap.to(root, {
-        rotateY: 0,
-        rotateX: 0,
-        duration: 0.5,
-        ease: "power2.out",
-      });
-    };
-    const onMove = (e: MouseEvent) => {
-      if (!isDesktop()) return;
-      const r = root.getBoundingClientRect();
-      const xv = e.clientX - r.left - r.width / 2;
-      const yv = e.clientY - r.top - r.height / 2;
-      gsap.to(root, {
-        rotateY: xv * 0.05,
-        rotateX: -yv * 0.05,
-        duration: 0.3,
-        ease: "power2.out",
-      });
-    };
-    const onTap = () => {
-      if (!isDesktop()) setSide((s) => (s === "front" ? "back" : "front"));
-    };
-    root.addEventListener("mouseenter", onEnter);
-    root.addEventListener("mouseleave", onLeave);
-    root.addEventListener("mousemove", onMove);
-    root.addEventListener("click", onTap);
-    return () => {
-      root.removeEventListener("mouseenter", onEnter);
-      root.removeEventListener("mouseleave", onLeave);
-      root.removeEventListener("mousemove", onMove);
-      root.removeEventListener("click", onTap);
-    };
-  }, []);
-
-  const leaf = (which: "top" | "bottom") => (
-    <div
-      className="absolute inset-x-0 overflow-hidden"
-      style={
-        which === "top"
-          ? { top: 0, height: "50%", perspective: 1000 }
-          : { bottom: 0, height: "50%", perspective: 1000 }
-      }
-    >
-      <div
-        ref={which === "top" ? topInner : botInner}
-        style={{
-          position: "absolute",
-          left: 0,
-          right: 0,
-          height: "200%",
-          [which === "top" ? "top" : "bottom"]: 0,
-          transformOrigin: which === "top" ? "center top" : "center bottom",
-          backfaceVisibility: "hidden",
-          willChange: "transform",
-        }}
-      >
-        <Face c={c} side={side} />
-      </div>
-    </div>
-  );
-
   return (
     <div
-      ref={rootRef}
       className="flip-card relative"
       data-cursor
       style={{
@@ -560,28 +258,10 @@ function FlipCard({ c }: { c: CaseStudy }) {
         height: "100%",
         minHeight: big ? 472 : 228,
         minWidth: 0,
-        transformStyle: "preserve-3d",
-        willChange: "transform, filter",
+        willChange: "filter",
       }}
     >
-      {leaf("top")}
-      {leaf("bottom")}
-      {/* the crack at the split line */}
-      <span
-        ref={crackRef}
-        aria-hidden
-        style={{
-          position: "absolute",
-          left: 0,
-          right: 0,
-          top: "50%",
-          height: 1,
-          background: "#E4E4E7",
-          opacity: 0,
-          zIndex: 5,
-          pointerEvents: "none",
-        }}
-      />
+      <FrontFace c={c} />
     </div>
   );
 }
@@ -670,7 +350,7 @@ export function Evidence() {
           }}
         >
           {CASES.map((c) => (
-            <FlipCard key={c.n} c={c} />
+            <StaticCard key={c.n} c={c} />
           ))}
         </div>
       </div>
