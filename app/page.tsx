@@ -1,5 +1,6 @@
 import { SiteProvider } from "@/components/SiteProvider";
 import { LaserSystem } from "@/components/LaserSystem";
+import { HeroSlashScroll } from "@/components/HeroSlashScroll";
 import { Cursor } from "@/components/Cursor";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
@@ -16,6 +17,7 @@ export default function Home() {
       <Cursor />
       <Nav />
       <LaserSystem />
+      <HeroSlashScroll />
       <main className="relative">
         <Manifesto />
         <Signal />

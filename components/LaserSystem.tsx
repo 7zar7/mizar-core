@@ -384,12 +384,12 @@ export function LaserSystem() {
 
       <motion.span
         animate={left}
-        className="absolute inset-y-0"
+        className="laser-line absolute inset-y-0"
         style={{ left: "var(--laser-left)", width: 1, background: "var(--border)" }}
       />
       <motion.span
         animate={right}
-        className="absolute inset-y-0"
+        className="laser-line absolute inset-y-0"
         style={{ left: "var(--laser-right)", width: 1, background: "var(--border)" }}
       />
     </div>
