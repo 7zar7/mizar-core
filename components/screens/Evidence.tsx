@@ -16,6 +16,8 @@ type CaseStudy = {
   desc: string;
   tags: [string, string];
   link?: string;
+  backType: "shot" | "text";
+  backLines?: string[];
 };
 
 const CASES: CaseStudy[] = [
@@ -31,6 +33,7 @@ const CASES: CaseStudy[] = [
     desc: "End-to-end build: design, copy, booking, SEO. Barcelona barbershop, live in 3 days.",
     tags: ["LIVE SITE", "BARCELONA"],
     link: "menslab-barbershop-wedq.vercel.app",
+    backType: "shot",
   },
   {
     n: "02",
@@ -44,6 +47,12 @@ const CASES: CaseStudy[] = [
     desc: "Full conversion landing for AI legal SaaS. Waitlist funnel, pricing tiers, social proof.",
     tags: ["LEGALTECH", "SAAS"],
     link: "clearsign-six.vercel.app",
+    backType: "text",
+    backLines: [
+      "AI contract review platform",
+      "Waitlist funnel · Pricing tiers · Social proof",
+      "Full conversion landing page",
+    ],
   },
   {
     n: "03",
@@ -57,6 +66,12 @@ const CASES: CaseStudy[] = [
     desc: "Brand, editorial copy and conversion site. Launched at €29, PDF delivered instantly.",
     tags: ["LIVE SITE", "EDITORIAL"],
     link: "milan-decoded.vercel.app",
+    backType: "text",
+    backLines: [
+      "Brand identity + editorial copy",
+      "Conversion site for insider travel guide",
+      "Launched at €29 · PDF delivered instantly",
+    ],
   },
   {
     n: "04",
@@ -69,6 +84,11 @@ const CASES: CaseStudy[] = [
     metricLabel: "expansion opportunity identified",
     desc: "10-K analysis across a 9-brand portfolio. 4 growth vectors, presented to stakeholders.",
     tags: ["COMPETITIVE INTEL", "C-SUITE"],
+    backType: "text",
+    backLines: [
+      "Full 10-K analysis · 9-brand portfolio",
+      "4 growth vectors · C-suite delivery",
+    ],
   },
   {
     n: "05",
@@ -81,6 +101,12 @@ const CASES: CaseStudy[] = [
     metricLabel: "annual revenue model",
     desc: "Ad infrastructure strategy from zero. CPM model, 3-phase rollout, C-suite approved.",
     tags: ["AD REVENUE", "GDPR"],
+    backType: "text",
+    backLines: [
+      "Ad infrastructure from zero",
+      "CPM model · 3-phase rollout",
+      "Approved by C-suite panel",
+    ],
   },
   {
     n: "06",
@@ -93,6 +119,12 @@ const CASES: CaseStudy[] = [
     metricLabel: "market sized bottom-up",
     desc: "Bottom-up sizing vs Stitch Fix. Diagnosed a 14–35× conversion gap, exec-approved.",
     tags: ["MARKET SIZING", "EXEC APPROVED"],
+    backType: "text",
+    backLines: [
+      "Stitch Fix competitive analysis",
+      "14–35× conversion gap diagnosed",
+      "CEO + 2 directors approved",
+    ],
   },
 ];
 
@@ -118,49 +150,69 @@ const TAG = (t: string) => (
   </span>
 );
 
-/** FRONT — origin marker, company, big metric, tags. */
+/** FRONT — dark metric header (40%) + light identity body (60%). */
 function FrontFace({ c }: { c: CaseStudy }) {
   const dark = c.kind === "nda";
   return (
     <div
       className="flex h-full w-full flex-col overflow-hidden"
       style={{
-        padding: 24,
         borderRadius: "4px 0px 24px 0px",
-        background: dark
-          ? "rgba(26,26,30,0.92)"
-          : "rgba(255,255,255,0.72)",
-        WebkitBackdropFilter: "blur(30px) saturate(120%)",
-        backdropFilter: "blur(30px) saturate(120%)",
         border: dark
           ? "1px solid rgba(196,30,14,0.3)"
           : "1px solid rgba(228,228,231,0.8)",
         boxShadow: "0 8px 40px rgba(0,0,0,0.06)",
-        position: "relative",
       }}
     >
-      <span
-        aria-hidden
+      {/* dark header — metric visible immediately */}
+      <div
+        className="relative flex shrink-0 items-center"
+        style={{ height: "40%", background: "#1A1A1E", padding: "0 24px" }}
+      >
+        <span
+          className="mono"
+          style={{
+            fontSize: 48,
+            fontWeight: 700,
+            color: "#C41E0E",
+            lineHeight: 1,
+            letterSpacing: "-0.02em",
+          }}
+        >
+          {c.metric}
+        </span>
+        <span
+          className="mono"
+          style={{
+            position: "absolute",
+            top: 14,
+            right: 16,
+            fontSize: 11,
+            color: "rgba(255,255,255,0.25)",
+            letterSpacing: "0.1em",
+          }}
+        >
+          {c.n}
+        </span>
+      </div>
+
+      {/* light identity body */}
+      <div
+        className="flex min-h-0 flex-1 flex-col"
         style={{
-          position: "absolute",
-          top: 0,
-          right: 0,
-          width: 16,
-          height: 16,
-          background: "#c41e0e",
-          clipPath: "polygon(100% 0, 0 0, 100% 100%)",
+          padding: 24,
+          background: dark
+            ? "rgba(26,26,30,0.92)"
+            : "rgba(255,255,255,0.72)",
+          WebkitBackdropFilter: "blur(30px) saturate(120%)",
+          backdropFilter: "blur(30px) saturate(120%)",
         }}
-      />
-      <div className="flex items-start justify-between">
-        <div>
-          <span style={{ display: "block", fontSize: 26, lineHeight: 1 }}>
-            {c.flag}
-          </span>
+      >
+        <div className="flex items-center gap-2">
+          <span style={{ fontSize: 22, lineHeight: 1 }}>{c.flag}</span>
           <span
             className="mono"
             style={{
-              display: "block",
-              marginTop: 4,
               fontSize: 9,
               letterSpacing: "0.2em",
               color: dark ? "rgba(255,255,255,0.4)" : "var(--text-muted)",
@@ -169,36 +221,11 @@ function FrontFace({ c }: { c: CaseStudy }) {
             {c.city}
           </span>
         </div>
-        <span
-          className="mono"
-          style={{
-            fontSize: 11,
-            color: dark ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.12)",
-            letterSpacing: "0.1em",
-          }}
-        >
-          {c.n}
-        </span>
-      </div>
-
-      <div className="mt-auto">
-        <div
-          className="mono"
-          style={{
-            fontSize: "clamp(34px,3vw,56px)",
-            fontWeight: 700,
-            color: "#c41e0e",
-            lineHeight: 1,
-            letterSpacing: "-0.02em",
-          }}
-        >
-          {c.metric}
-        </div>
         <p
           style={{
             color: dark ? "rgba(255,255,255,0.6)" : "var(--text-secondary)",
             fontSize: 13,
-            marginTop: 6,
+            marginTop: 10,
           }}
         >
           {c.metricLabel}
@@ -206,16 +233,18 @@ function FrontFace({ c }: { c: CaseStudy }) {
         <p
           className="mono"
           style={{
-            fontSize: 15,
+            fontSize: 16,
             fontWeight: 700,
             letterSpacing: "0.02em",
-            marginTop: 12,
+            marginTop: 8,
             color: dark ? "#fff" : "var(--text-primary)",
           }}
         >
           {c.company}
         </p>
-        <div className="mt-3 flex flex-wrap gap-2">{c.tags.map(TAG)}</div>
+        <div className="mt-auto flex flex-wrap gap-2" style={{ paddingTop: 12 }}>
+          {c.tags.map(TAG)}
+        </div>
       </div>
     </div>
   );
@@ -243,51 +272,104 @@ function LiveShot({ url }: { url: string }) {
   );
 }
 
-/** BACK — screenshot / strategy detail + link. */
+const BACK_SHELL: React.CSSProperties = {
+  borderRadius: "4px 0px 24px 0px",
+  background: "#1A1A1E",
+  border: "1px solid rgba(196,30,14,0.3)",
+};
+
+/** BACK — screenshot (MensLab) or explicit dark text panel. */
 function BackFace({ c }: { c: CaseStudy }) {
-  return (
-    <div
-      className="relative flex h-full w-full flex-col overflow-hidden"
-      style={{
-        borderRadius: "4px 0px 24px 0px",
-        background: "#1a1a1e",
-        border: "1px solid rgba(196,30,14,0.3)",
-      }}
-    >
-      {c.kind === "live" && c.link ? (
-        <div className="absolute inset-0" style={{ opacity: 0.5 }}>
+  // MensLab keeps the live screenshot
+  if (c.backType === "shot" && c.link) {
+    return (
+      <div
+        className="relative flex h-full w-full flex-col overflow-hidden"
+        style={BACK_SHELL}
+      >
+        <div className="absolute inset-0">
           <LiveShot url={c.link} />
         </div>
-      ) : null}
-      <div
-        className="relative mt-auto flex flex-col"
+        <div
+          className="relative mt-auto flex flex-col"
+          style={{
+            padding: 20,
+            background:
+              "linear-gradient(to top, rgba(26,26,30,0.97), rgba(26,26,30,0))",
+          }}
+        >
+          <p
+            className="mono"
+            style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}
+          >
+            {c.company}
+          </p>
+          <p
+            style={{
+              color: "rgba(255,255,255,0.72)",
+              fontSize: 13,
+              lineHeight: 1.5,
+              marginTop: 6,
+            }}
+          >
+            {c.desc}
+          </p>
+          <a
+            href={`https://${c.link}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-cursor
+            className="mono"
+            style={{
+              fontSize: 12,
+              color: "#c41e0e",
+              borderBottom: "1px solid #c41e0e",
+              paddingBottom: 2,
+              marginTop: 10,
+              alignSelf: "flex-start",
+              wordBreak: "break-all",
+            }}
+          >
+            {c.link} ↗
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  // explicit dark text panel (ClearSign, Milan, NDA cases)
+  const lines = c.backLines ?? [c.desc];
+  return (
+    <div
+      className="flex h-full w-full flex-col overflow-hidden"
+      style={{ ...BACK_SHELL, padding: 24 }}
+    >
+      <p
+        className="mono"
         style={{
-          padding: 24,
-          background:
-            "linear-gradient(to top, rgba(26,26,30,0.96), rgba(26,26,30,0.4))",
+          fontSize: 14,
+          fontWeight: 700,
+          color: "#fff",
+          letterSpacing: "0.04em",
         }}
       >
-        <p
-          className="mono"
-          style={{
-            fontSize: 14,
-            fontWeight: 700,
-            color: "#fff",
-            letterSpacing: "0.04em",
-          }}
-        >
-          {c.company}
-        </p>
-        <p
-          style={{
-            color: "rgba(255,255,255,0.7)",
-            fontSize: 13,
-            lineHeight: 1.55,
-            marginTop: 8,
-          }}
-        >
-          {c.desc}
-        </p>
+        {c.company}
+      </p>
+      <div className="mt-3 flex flex-col gap-1.5">
+        {lines.map((l) => (
+          <p
+            key={l}
+            style={{
+              color: "rgba(255,255,255,0.72)",
+              fontSize: 13,
+              lineHeight: 1.45,
+            }}
+          >
+            {l}
+          </p>
+        ))}
+      </div>
+      <div className="mt-auto" style={{ paddingTop: 14 }}>
         {c.kind === "nda" ? (
           <p
             className="mono"
@@ -295,7 +377,6 @@ function BackFace({ c }: { c: CaseStudy }) {
               fontSize: 10,
               fontStyle: "italic",
               color: "rgba(255,255,255,0.4)",
-              marginTop: 10,
             }}
           >
             Scope anonymized per NDA
@@ -312,8 +393,7 @@ function BackFace({ c }: { c: CaseStudy }) {
               color: "#c41e0e",
               borderBottom: "1px solid #c41e0e",
               paddingBottom: 2,
-              marginTop: 12,
-              alignSelf: "flex-start",
+              wordBreak: "break-all",
             }}
           >
             {c.link} ↗
@@ -479,6 +559,7 @@ function FlipCard({ c }: { c: CaseStudy }) {
         gridRow: big ? "span 2" : "span 1",
         height: "100%",
         minHeight: big ? 472 : 228,
+        minWidth: 0,
         transformStyle: "preserve-3d",
         willChange: "transform, filter",
       }}
