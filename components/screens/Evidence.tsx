@@ -13,6 +13,7 @@ import { SectionTag } from "../SectionTag";
 
 type CaseStudy = {
   n: string;
+  flag: string;
   kind: "live" | "nda";
   industry: string;
   company: string;
@@ -26,6 +27,7 @@ type CaseStudy = {
 const CASES: CaseStudy[] = [
   {
     n: "01",
+    flag: "🇪🇸",
     kind: "live",
     industry: "LOCAL BUSINESS",
     company: "MENSLAB BCN",
@@ -37,6 +39,19 @@ const CASES: CaseStudy[] = [
   },
   {
     n: "02",
+    flag: "🇨🇦",
+    kind: "live",
+    industry: "LEGAL SAAS",
+    company: "CLEARSIGN",
+    metric: "2,400+",
+    metricLabel: "waitlist signups at launch",
+    desc: "Full conversion landing for AI legal SaaS. Waitlist funnel, pricing tiers, social proof.",
+    tags: ["LEGALTECH", "SAAS"],
+    link: "clearsign-six.vercel.app",
+  },
+  {
+    n: "03",
+    flag: "🇮🇹",
     kind: "live",
     industry: "LIFESTYLE EDITORIAL",
     company: "MILAN DECODED",
@@ -47,7 +62,8 @@ const CASES: CaseStudy[] = [
     link: "milan-decoded.vercel.app",
   },
   {
-    n: "03",
+    n: "04",
+    flag: "🇺🇸",
     kind: "nda",
     industry: "COMPETITIVE INTELLIGENCE",
     company: "MATCH GROUP",
@@ -57,7 +73,8 @@ const CASES: CaseStudy[] = [
     tags: ["COMPETITIVE INTEL", "C-SUITE"],
   },
   {
-    n: "04",
+    n: "05",
+    flag: "🇺🇸",
     kind: "nda",
     industry: "AD MONETIZATION",
     company: "SPARK",
@@ -67,7 +84,8 @@ const CASES: CaseStudy[] = [
     tags: ["AD REVENUE", "GDPR"],
   },
   {
-    n: "05",
+    n: "06",
+    flag: "🇺🇸",
     kind: "nda",
     industry: "MARKET RESEARCH",
     company: "PERSONAL STYLING CO.",
@@ -246,7 +264,29 @@ function CardInner({ c }: { c: CaseStudy }) {
           <DarkMetric metric={c.metric} />
         )}
       </div>
-      <CardBody c={c} />
+      {/* case-number watermark + country flag */}
+      <span
+        aria-hidden
+        className="mono"
+        style={{
+          position: "absolute",
+          bottom: 10,
+          right: 22,
+          fontSize: 80,
+          fontWeight: 900,
+          lineHeight: 1,
+          letterSpacing: "-0.02em",
+          color: "rgba(0,0,0,0.06)",
+          whiteSpace: "nowrap",
+          pointerEvents: "none",
+          zIndex: 0,
+        }}
+      >
+        {c.n} {c.flag}
+      </span>
+      <div style={{ position: "relative", zIndex: 1 }}>
+        <CardBody c={c} />
+      </div>
     </GlassCard>
   );
 }
@@ -331,7 +371,18 @@ export function Evidence() {
         className="mt-3"
         style={{ color: "var(--text-secondary)", fontSize: 16 }}
       >
-        Two live sites. Three strategic engagements.
+        Three live sites. Three strategic engagements.
+      </p>
+      <p
+        className="mono"
+        style={{
+          fontSize: 11,
+          color: "var(--text-muted)",
+          marginTop: 12,
+          marginBottom: 32,
+        }}
+      >
+        🇪🇸 Barcelona · 🇮🇹 Milan · 🇨🇦 Canada · 🇺🇸 United States
       </p>
     </div>
   );
