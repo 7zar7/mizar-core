@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useSite } from "./SiteProvider";
 
 /**
  * Custom precision cursor: a crosshair reticle with a red target dot.
@@ -9,7 +8,6 @@ import { useSite } from "./SiteProvider";
  * "DEPLOY" tag over CTAs. Native cursor is hidden on fine pointers.
  */
 export function Cursor() {
-  const { isMobile } = useSite();
   const dot = useRef<HTMLDivElement>(null);
   const [hover, setHover] = useState(false);
   const [cta, setCta] = useState(false);
@@ -17,7 +15,6 @@ export function Cursor() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (isMobile) return;
     let raf = 0;
     let x = window.innerWidth / 2;
     let y = window.innerHeight / 2;
@@ -43,7 +40,6 @@ export function Cursor() {
       setHover(!!t);
       setCta(!!(e.target as HTMLElement)?.closest?.(".btn-dark, .btn-light"));
     };
-    const leave = () => setVisible(false);
     const dn = () => setDown(true);
     const up = () => setDown(false);
     const onBlur = () => setVisible(false);
@@ -55,7 +51,6 @@ export function Cursor() {
     window.addEventListener("pointermove", move, { passive: true });
     window.addEventListener("pointerover", over, { passive: true });
     window.addEventListener("pointerout", onOut);
-    document.addEventListener("pointerleave", leave);
     window.addEventListener("pointerdown", dn);
     window.addEventListener("pointerup", up);
     window.addEventListener("blur", onBlur);
@@ -64,7 +59,6 @@ export function Cursor() {
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerover", over);
       window.removeEventListener("pointerout", onOut);
-      document.removeEventListener("pointerleave", leave);
       window.removeEventListener("pointerdown", dn);
       window.removeEventListener("pointerup", up);
       window.removeEventListener("blur", onBlur);
@@ -73,9 +67,7 @@ export function Cursor() {
       // restore the native cursor if the overlay is unmounted
       document.body.style.cursor = "auto";
     };
-  }, [isMobile]);
-
-  if (isMobile) return null;
+  }, []);
 
   const size = hover ? 32 : 24;
 
@@ -83,8 +75,9 @@ export function Cursor() {
     <div
       ref={dot}
       aria-hidden
-      className="pointer-events-none fixed left-0 top-0 z-[120]"
+      className="pointer-events-none fixed left-0 top-0"
       style={{
+        zIndex: 99999,
         opacity: visible ? 1 : 0,
         transition: "opacity 150ms ease",
         mixBlendMode: "normal",

@@ -10,7 +10,7 @@ const SLAM = [0.2, 0, 0, 1] as const;
 function LosingDeals() {
   return (
     <section
-      className="relative flex w-full flex-col items-center justify-center px-6 text-center"
+      className="pm-screen-1 relative flex w-full flex-col items-center justify-center px-6 text-center"
       style={{ minHeight: "78vh" }}
     >
       <SectionTag n="02" />
@@ -18,7 +18,7 @@ function LosingDeals() {
         initial={{ opacity: 0, y: 8 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.6 }}
-        transition={{ delay: 0.9, duration: 0.5, ease: EASE }}
+        transition={{ delay: 0.45, duration: 0.25, ease: EASE }}
         style={{
           fontWeight: 700,
           fontSize: "clamp(22px,2.6vw,34px)",
@@ -33,7 +33,7 @@ function LosingDeals() {
         initial={{ opacity: 0, filter: "blur(20px)" }}
         whileInView={{ opacity: 1, filter: "blur(0px)" }}
         viewport={{ once: true, amount: 0.6 }}
-        transition={{ duration: 0.8, ease: EASE }}
+        transition={{ duration: 0.4, ease: EASE }}
         style={{
           fontWeight: 900,
           fontSize: "clamp(48px,7.5vw,104px)",
@@ -52,14 +52,14 @@ function LosingDeals() {
 function ThePunch() {
   return (
     <section
-      className="relative flex w-full flex-col items-center justify-center gap-[10vh] px-6 text-center"
+      className="pm-punch relative flex w-full flex-col items-center justify-center gap-[10vh] px-6 text-center"
       style={{ minHeight: "150vh" }}
     >
       <motion.h2
         initial={{ opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.7 }}
-        transition={{ duration: 0.5, ease: EASE }}
+        transition={{ duration: 0.25, ease: EASE }}
         style={{
           fontWeight: 900,
           fontSize: "clamp(40px,6vw,84px)",
@@ -76,7 +76,7 @@ function ThePunch() {
         initial={{ scaleX: 0 }}
         whileInView={{ scaleX: 1 }}
         viewport={{ once: true, amount: 0.9 }}
-        transition={{ duration: 0.3, ease: "linear" }}
+        transition={{ duration: 0.15, ease: "linear" }}
         style={{
           position: "absolute",
           top: "50%",
@@ -92,7 +92,7 @@ function ThePunch() {
         initial={{ opacity: 0, y: 40, scale: 1.1 }}
         whileInView={{ opacity: 1, y: 0, scale: 1 }}
         viewport={{ once: true, amount: 0.7 }}
-        transition={{ duration: 0.4, ease: SLAM, delay: 0.35 }}
+        transition={{ duration: 0.2, ease: SLAM, delay: 0.18 }}
         style={{
           fontWeight: 900,
           fontSize: "clamp(40px,6vw,84px)",

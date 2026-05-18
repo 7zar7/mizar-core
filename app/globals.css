@@ -255,14 +255,23 @@ body {
 }
 
 @media (hover: hover) and (pointer: fine) {
-  body {
-    cursor: none;
+  body,
+  body * {
+    cursor: none !important;
   }
-  body a,
-  body button,
-  body input,
-  body [data-cursor] {
-    cursor: none;
+}
+
+/* Mobile — tighten pain-mirror rhythm (rapid punches) */
+@media (max-width: 767px) {
+  .pm-screen-1 {
+    min-height: 40vh !important;
+  }
+  .pm-punch {
+    min-height: 78vh !important;
+    gap: 5vh !important;
+  }
+  .evidence-section {
+    padding-top: 3rem !important;
   }
 }
 

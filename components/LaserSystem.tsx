@@ -327,16 +327,6 @@ export function LaserSystem() {
             background: "var(--border)",
           }}
         />
-        {/* the Z, made structural — center red line (ghost of the Z) */}
-        <span
-          className="z-laser absolute inset-y-0"
-          style={{
-            left: "50%",
-            width: 1,
-            background: "#C41E0E",
-            opacity: 0,
-          }}
-        />
       </div>
 
       {/* interactive teasers — above content, edge-constrained */}
