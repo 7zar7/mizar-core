@@ -35,7 +35,8 @@ export function Manifesto() {
   const [typed, setTyped] = useState(false);
 
   useEffect(() => {
-    const t = setTimeout(() => setTyped(true), 300);
+    // system label types in after the scramble intro completes
+    const t = setTimeout(() => setTyped(true), 1500);
     return () => clearTimeout(t);
   }, []);
 
@@ -46,6 +47,25 @@ export function Manifesto() {
   return (
     <section className="hero-section relative flex h-screen w-full items-center justify-center overflow-hidden">
       <SectionTag n="01" />
+
+      {/* Scramble intro overlay (driven by HeroSlashScroll) */}
+      <span
+        className="scramble-line mono"
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          fontSize: 14,
+          letterSpacing: "0.18em",
+          color: "#00E5FF",
+          whiteSpace: "pre",
+          zIndex: 5,
+          pointerEvents: "none",
+        }}
+      />
+
       <div className="flex flex-col items-center px-6 text-center">
         <div className="text-text-muted">
           <Typewriter text={SYS} start={typed} />
