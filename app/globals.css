@@ -241,12 +241,6 @@ body {
     grid-template-columns: repeat(2, 1fr);
   }
 }
-@media (max-width: 767px) {
-  .evi-grid {
-    grid-template-columns: 1fr !important;
-  }
-}
-
 .folder-card {
   transition: transform 150ms ease;
 }
@@ -266,31 +260,84 @@ body {
   }
 }
 
+/* cinematic video crop fades */
+.video-wrapper {
+  position: relative;
+}
+.video-wrapper::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 25%;
+  background: linear-gradient(to bottom, #0a0e12, transparent);
+  z-index: 2;
+  pointer-events: none;
+}
+.video-wrapper::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 35%;
+  background: linear-gradient(to top, #0a0e12, transparent);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.cta-final {
+  transition: background 150ms ease;
+}
+.cta-final:hover {
+  background: #a01a0c !important;
+}
+
+@keyframes pulse-red {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(196, 30, 14, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(196, 30, 14, 0);
+  }
+}
+
 /* video chain line is mobile-only */
 .proc-mobile-chain {
   display: none;
 }
 
-/* Mobile — punchy spacing, no laser overlay, compact cards */
+/* Mobile — punchy spacing, no laser overlay, 2-col compact cards */
 @media (max-width: 767px) {
-  .laser-line {
+  [class*="laser"],
+  [class*="vertical-line"],
+  [class*="grid-line"] {
     display: none !important;
   }
   .pm-screen-1 {
     min-height: 60vh !important;
   }
   .pm-punch {
-    min-height: 110vh !important;
+    min-height: 96vh !important;
     gap: 6vh !important;
   }
-  .vp-statement {
-    min-height: 50vh !important;
+  .evi-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
   }
   .folder-card {
-    height: 280px !important;
+    height: 220px !important;
+    min-height: 220px !important;
   }
-  .evidence-section {
-    padding-top: 3rem !important;
+  .folder-grad {
+    height: 40% !important;
+  }
+  .process-section,
+  .evidence-section,
+  .vp-compact {
+    padding: 48px 20px !important;
   }
   .proc-overlay {
     display: none !important;

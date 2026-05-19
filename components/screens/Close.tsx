@@ -119,13 +119,23 @@ export function Close() {
 
         <motion.a
           href="#configurator"
+          data-cursor
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.35 }}
-          className="btn-light mt-10 px-9 py-5"
+          className="cta-final mono mt-10 px-9 py-5"
+          style={{
+            background: "#C41E0E",
+            color: "#fff",
+            border: "none",
+            borderRadius: 2,
+            fontWeight: 700,
+            letterSpacing: "0.06em",
+            animation: "pulse-red 2s infinite",
+          }}
         >
-          [ START A PROJECT ]
+          [ START YOUR PROJECT NOW ]
         </motion.a>
 
         <motion.p

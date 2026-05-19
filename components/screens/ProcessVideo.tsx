@@ -71,7 +71,7 @@ export function ProcessVideo() {
         </Reveal>
 
         <div
-          className="relative mx-auto mt-12"
+          className="video-wrapper mx-auto mt-12"
           style={{
             maxWidth: 900,
             border: "1px solid rgba(196,30,14,0.3)",
@@ -92,6 +92,7 @@ export function ProcessVideo() {
               background: "#0A0E12",
               aspectRatio: "16 / 9",
               objectFit: "cover",
+              objectPosition: "center 20%",
             }}
           />
 
