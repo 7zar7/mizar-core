@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { SectionTag } from "../SectionTag";
+import { Reveal } from "../Reveal";
 
 const PANEL: React.CSSProperties = {
   position: "absolute",
@@ -48,24 +49,26 @@ export function ProcessVideo() {
     >
       <SectionTag n="VID" dark />
       <div className="mx-auto max-w-content px-[6vw]">
-        <p
-          className="mono"
-          style={{ fontSize: 11, letterSpacing: "0.2em", color: "#C41E0E" }}
-        >
-          {"// HOW WE WORK"}
-        </p>
-        <h2
-          className="h-display mt-4"
-          style={{
-            fontSize: "clamp(32px,4vw,56px)",
-            color: "#fff",
-            maxWidth: 640,
-          }}
-        >
-          Brief to live site.
-          <br />
-          No 6-week timelines.
-        </h2>
+        <Reveal>
+          <p
+            className="mono"
+            style={{ fontSize: 11, letterSpacing: "0.2em", color: "#C41E0E" }}
+          >
+            {"// HOW WE WORK"}
+          </p>
+          <h2
+            className="h-display mt-4"
+            style={{
+              fontSize: "clamp(32px,4vw,56px)",
+              color: "#fff",
+              maxWidth: 640,
+            }}
+          >
+            Brief to live site.
+            <br />
+            No 6-week timelines.
+          </h2>
+        </Reveal>
 
         <div
           className="relative mx-auto mt-12"
@@ -93,7 +96,7 @@ export function ProcessVideo() {
           />
 
           {/* Node 1 */}
-          <div style={{ ...L(active === 1), left: "8%" }}>
+          <div className="proc-overlay" style={{ ...L(active === 1), left: "8%" }}>
             <div style={HEAD}>INCOMING BRIEF</div>
             <div style={WHITE}>SCOPE ············ ✓</div>
             <div style={{ ...WHITE, marginTop: 3 }}>TIMELINE ········· ✓</div>
@@ -101,7 +104,7 @@ export function ProcessVideo() {
           </div>
 
           {/* Node 2 */}
-          <div style={{ ...L(active === 2), left: "32%" }}>
+          <div className="proc-overlay" style={{ ...L(active === 2), left: "32%" }}>
             <div style={HEAD}>STRATEGY FIRST</div>
             <div style={{ ...WHITE, fontSize: 12, fontWeight: 700 }}>
               ICP → MESSAGE → CTA
@@ -110,7 +113,7 @@ export function ProcessVideo() {
           </div>
 
           {/* Node 3 */}
-          <div style={{ ...L(active === 3), left: "56%" }}>
+          <div className="proc-overlay" style={{ ...L(active === 3), left: "56%" }}>
             <div style={HEAD}>BUILD + DEPLOY</div>
             <div
               aria-hidden
@@ -127,7 +130,7 @@ export function ProcessVideo() {
           </div>
 
           {/* Node 4 */}
-          <div style={{ ...L(active === 4), right: "6%" }}>
+          <div className="proc-overlay" style={{ ...L(active === 4), right: "6%" }}>
             <div style={HEAD}>SITE THAT CLOSES</div>
             <div style={WHITE}>From brief to revenue</div>
             <div style={{ color: "#C41E0E", fontSize: 20, marginTop: 6 }}>
@@ -135,6 +138,19 @@ export function ProcessVideo() {
             </div>
           </div>
         </div>
+
+        <p
+          className="proc-mobile-chain mono"
+          style={{
+            fontSize: 10,
+            color: "#C41E0E",
+            textAlign: "center",
+            letterSpacing: "0.1em",
+            marginTop: 18,
+          }}
+        >
+          INCOMING BRIEF → STRATEGY FIRST → BUILD + DEPLOY → SITE THAT CLOSES
+        </p>
 
         <p
           className="mono"

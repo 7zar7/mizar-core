@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { SectionTag } from "../SectionTag";
+import { Reveal } from "../Reveal";
 
 type CaseStudy = {
   n: string;
@@ -136,100 +138,104 @@ const GRADIENTS: Record<string, string> = {
   "06": "linear-gradient(135deg,#0F766E 0%,#0EA5E9 50%,#38BDF8 100%)",
 };
 
-/** Digital-folder card: gradient header tab + dark info panel. */
+/** Digital-folder card — clean gradient header + dark info panel.
+ *  Whole card is clickable: live → site, NDA → tooltip. */
 function FolderCard({ c }: { c: CaseStudy }) {
   const live = c.kind === "live" && !!c.link;
-  return (
-    <div
-      className="folder-card relative overflow-hidden"
-      data-cursor
-      style={{
-        height: 380,
-        background: "#121214",
-        clipPath:
-          "polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 0 100%)",
-      }}
-    >
-      {/* gradient header (55%) */}
+  const [tip, setTip] = useState(false);
+
+  const body = (
+    <>
       <div
         className="folder-grad"
         aria-hidden
         style={{
-          height: "55%",
+          height: "45%",
           background: GRADIENTS[c.n] ?? GRADIENTS["01"],
           transition: "filter 120ms ease",
-          clipPath:
-            "polygon(0 0, 100% 0, 100% 78%, 62% 78%, 56% 100%, 50% 78%, 0 78%)",
+          borderRadius: "4px 4px 0 0",
         }}
       />
-
-      {/* info panel (45%) */}
       <div
         className="flex flex-col"
-        style={{ height: "45%", padding: "16px 22px 20px" }}
+        style={{ height: "55%", padding: "14px 18px 16px" }}
       >
         <p
           className="mono"
-          style={{
-            fontSize: 10,
-            letterSpacing: "0.2em",
-            color: "#666",
-          }}
+          style={{ fontSize: 10, letterSpacing: "0.2em", color: "#666" }}
         >
           {`0${c.n.replace(/^0/, "")}`.slice(-3)} · {c.industry}
         </p>
         <p
           style={{
             fontWeight: 700,
-            fontSize: 16,
+            fontSize: 15,
             color: "#fff",
-            marginTop: 8,
+            marginTop: 6,
           }}
         >
           {c.company}
         </p>
         <p
           className="mono"
-          style={{ fontSize: 11, color: "#C41E0E", marginTop: 6 }}
+          style={{ fontSize: 11, color: "#C41E0E", marginTop: 5 }}
         >
           {c.metric} · {c.metricLabel}
         </p>
         <p
           className="mono"
-          style={{ fontSize: 10, color: "#666", marginTop: 6 }}
+          style={{ fontSize: 10, color: "#666", marginTop: 5 }}
         >
           {c.tags.join(" · ")}
         </p>
-
         <div className="mt-auto flex items-end justify-between">
-          <span
-            className="mono"
-            style={{ fontSize: 11, color: "#888" }}
-          >
+          <span className="mono" style={{ fontSize: 11, color: "#888" }}>
             {c.flag} {c.city}
           </span>
-          {live ? (
-            <a
-              href={`https://${c.link}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              data-cursor
-              className="mono"
-              style={{ fontSize: 13, color: "#C41E0E" }}
-            >
-              ↗
-            </a>
-          ) : (
-            <span
-              className="mono"
-              style={{ fontSize: 10, color: "#666" }}
-            >
-              NDA
-            </span>
-          )}
+          <span
+            className="mono"
+            style={{ fontSize: live ? 13 : 10, color: "#C41E0E" }}
+          >
+            {live ? "↗" : tip ? "NDA · Available on request" : "NDA"}
+          </span>
         </div>
       </div>
-    </div>
+    </>
+  );
+
+  const shell =
+    "folder-card relative block overflow-hidden text-left";
+  const style: React.CSSProperties = {
+    height: 360,
+    background: "#121214",
+    borderRadius: 4,
+    border: "1px solid rgba(255,255,255,0.06)",
+  };
+
+  if (live) {
+    return (
+      <a
+        href={`https://${c.link}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        data-cursor
+        className={shell}
+        style={style}
+      >
+        {body}
+      </a>
+    );
+  }
+  return (
+    <button
+      type="button"
+      data-cursor
+      onClick={() => setTip((t) => !t)}
+      className={shell}
+      style={{ ...style, cursor: "pointer", width: "100%" }}
+    >
+      {body}
+    </button>
   );
 }
 
@@ -238,40 +244,42 @@ export function Evidence() {
     <section id="evidence" className="evidence-section relative w-full py-24">
       <SectionTag n="03" />
       <div className="mx-auto max-w-content px-[6vw]">
-        <p
-          className="mono"
-          style={{ fontSize: 11, letterSpacing: "0.2em", color: "#c41e0e" }}
-        >
-          {"// WEB STUDIO & STRATEGIC WORK"}
-        </p>
-        <p className="label-mono mt-2">EVIDENCE // ANTIDOTES</p>
-        <h2
-          className="h-display mt-3"
-          style={{ fontSize: "clamp(30px,4vw,56px)", maxWidth: 680 }}
-        >
-          Proof, not decoration.
-        </h2>
-        <p
-          className="mt-3"
-          style={{ color: "var(--text-secondary)", fontSize: 16 }}
-        >
-          Three live sites. Three strategic engagements.
-        </p>
-        <p
-          className="mono"
-          style={{
-            fontSize: 11,
-            color: "var(--text-muted)",
-            marginTop: 12,
-            marginBottom: 32,
-          }}
-        >
-          🇪🇸 Barcelona · 🇮🇹 Milan · 🇨🇦 Canada · 🇺🇸 United States
-        </p>
+        <Reveal>
+          <p
+            className="mono"
+            style={{ fontSize: 11, letterSpacing: "0.2em", color: "#c41e0e" }}
+          >
+            {"// WEB STUDIO & STRATEGIC WORK"}
+          </p>
+          <p className="label-mono mt-2">EVIDENCE // ANTIDOTES</p>
+          <h2
+            className="h-display mt-3"
+            style={{ fontSize: "clamp(30px,4vw,56px)", maxWidth: 680 }}
+          >
+            Six engagements. Real outcomes.
+          </h2>
+          <p
+            className="mt-3"
+            style={{ color: "var(--text-secondary)", fontSize: 16 }}
+          >
+            Three live sites. Three strategic engagements.
+          </p>
+          <p
+            className="mono"
+            style={{
+              fontSize: 11,
+              color: "var(--text-muted)",
+              marginTop: 12,
+              marginBottom: 32,
+            }}
+          >
+            🇪🇸 Barcelona · 🇮🇹 Milan · 🇨🇦 Canada · 🇺🇸 United States
+          </p>
+        </Reveal>
 
         <div
           className="evi-grid"
-          style={{ display: "grid", gap: 20, paddingBottom: 48 }}
+          style={{ display: "grid", gap: 16, paddingBottom: 48 }}
         >
           {CASES.map((c) => (
             <FolderCard key={c.n} c={c} />

@@ -34,9 +34,7 @@ function Statement({
 }) {
   const words = lines.join(" \n ").split(" ");
   return (
-    <section
-      className="relative flex min-h-screen w-full flex-col items-center justify-center px-6 text-center"
-    >
+    <section className="vp-statement relative flex min-h-screen w-full flex-col items-center justify-center px-6 text-center">
       {tag && <SectionTag n={tag} />}
       <motion.p
         initial={{ opacity: 0, y: 6 }}

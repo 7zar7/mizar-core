@@ -266,17 +266,37 @@ body {
   }
 }
 
-/* Mobile — tighten pain-mirror rhythm (rapid punches) */
+/* video chain line is mobile-only */
+.proc-mobile-chain {
+  display: none;
+}
+
+/* Mobile — punchy spacing, no laser overlay, compact cards */
 @media (max-width: 767px) {
+  .laser-line {
+    display: none !important;
+  }
   .pm-screen-1 {
-    min-height: 40vh !important;
+    min-height: 60vh !important;
   }
   .pm-punch {
-    min-height: 78vh !important;
-    gap: 5vh !important;
+    min-height: 110vh !important;
+    gap: 6vh !important;
+  }
+  .vp-statement {
+    min-height: 50vh !important;
+  }
+  .folder-card {
+    height: 280px !important;
   }
   .evidence-section {
     padding-top: 3rem !important;
+  }
+  .proc-overlay {
+    display: none !important;
+  }
+  .proc-mobile-chain {
+    display: block;
   }
 }
 
