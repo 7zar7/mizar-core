@@ -1,6 +1,5 @@
 "use client";
 
-import { motion, useAnimationControls } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useSite } from "./SiteProvider";
 
@@ -283,52 +282,15 @@ const RIGHT_FRAGS: Frag[] = [
 ];
 
 /**
- * Structural DNA: two SOLID vertical laser lines at 28vw / 72vw, kept
- * BEHIND content (z-0). The floating thumbnails + discovery fragments
- * live in a separate layer ABOVE content so they stay hoverable and
- * clickable; each carries its own blur (cleared on hover).
+ * Floating interactive layer: live-site thumbnails + discovery fragments.
+ * The structural vertical laser lines have been replaced by the <Orbs />
+ * physics layer. Each fragment carries its own blur (cleared on hover).
  */
 export function LaserSystem() {
-  const { pulseKey, isMobile } = useSite();
-  const left = useAnimationControls();
-  const right = useAnimationControls();
-
-  useEffect(() => {
-    if (pulseKey === 0) return;
-    const ripple = { opacity: [1, 0.3, 1] };
-    const t = { duration: 0.4, ease: "easeInOut" as const };
-    left.start({ ...ripple, transition: t });
-    right.start({ ...ripple, transition: t });
-  }, [pulseKey, left, right]);
+  const { isMobile } = useSite();
 
   return (
     <>
-      {/* structural lines — behind content */}
-      <div
-        aria-hidden
-        className="pointer-events-none fixed inset-0 z-0"
-        style={{ contain: "strict" }}
-      >
-        <motion.span
-          animate={left}
-          className="laser-line absolute inset-y-0"
-          style={{
-            left: "var(--laser-left)",
-            width: 1,
-            background: "var(--border)",
-          }}
-        />
-        <motion.span
-          animate={right}
-          className="laser-line absolute inset-y-0"
-          style={{
-            left: "var(--laser-right)",
-            width: 1,
-            background: "var(--border)",
-          }}
-        />
-      </div>
-
       {/* interactive teasers — above content, edge-constrained */}
       {!isMobile && (
         <div

@@ -1,5 +1,6 @@
 import { SiteProvider } from "@/components/SiteProvider";
 import { LaserSystem } from "@/components/LaserSystem";
+import { Orbs } from "@/components/Orbs";
 import { HeroSlashScroll } from "@/components/HeroSlashScroll";
 import { Cursor } from "@/components/Cursor";
 import { Nav } from "@/components/Nav";
@@ -16,6 +17,7 @@ export default function Home() {
       <span id="top" />
       <Cursor />
       <Nav />
+      <Orbs />
       <LaserSystem />
       <HeroSlashScroll />
       <main className="relative">
