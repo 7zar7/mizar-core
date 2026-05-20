@@ -5,7 +5,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import gsap from "gsap";
 import { SectionTag } from "../SectionTag";
 
-const EASE = [0.4, 0, 0.2, 1] as const;
 
 type Stage = "PRE-SEED" | "SEED ROUND" | "SERIES A+" | "LOCAL";
 type Vertical =
@@ -245,44 +244,11 @@ function OutputRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-function RecomposeLogo() {
-  return (
-    <div
-      className="flex items-center font-display"
-      style={{ fontSize: "clamp(30px,5vw,52px)", color: "#fff" }}
-    >
-      <motion.span
-        initial={{ x: -60, opacity: 0, filter: "blur(8px)" }}
-        animate={{ x: 0, opacity: 1, filter: "blur(0px)" }}
-        transition={{ delay: 0.45, duration: 0.5, ease: EASE }}
-      >
-        MIZAR
-      </motion.span>
-      <motion.span
-        className="mx-2 font-light"
-        style={{ color: "#c41e0e" }}
-        initial={{ scaleY: 36, opacity: 0 }}
-        animate={{ scaleY: 1, opacity: 1 }}
-        transition={{ duration: 0.4, ease: EASE }}
-      >
-        {"//"}
-      </motion.span>
-      <motion.span
-        initial={{ x: 60, opacity: 0, filter: "blur(8px)" }}
-        animate={{ x: 0, opacity: 1, filter: "blur(0px)" }}
-        transition={{ delay: 0.45, duration: 0.5, ease: EASE }}
-      >
-        CORE
-      </motion.span>
-    </div>
-  );
-}
 
 export function Configurator() {
   const [stage, setStage] = useState<Stage>("PRE-SEED");
   const [vertical, setVertical] = useState<Vertical>("WEB STUDIO");
   const [slider, setSlider] = useState(20);
-  const [opened, setOpened] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
 
   const result = useMemo(() => compute(stage, slider), [stage, slider]);
@@ -556,105 +522,17 @@ export function Configurator() {
               />
             </div>
 
-            <button
-              type="button"
-              onClick={() => setOpened(true)}
-              className="btn-dark btn-deploy w-full"
+            <a
+              href={`mailto:hello@mizarcore.studio?subject=${encodeURIComponent(
+                `Project Brief: ${stage} ${vertical}`,
+              )}`}
+              data-cursor
+              className="btn-dark btn-deploy mono block w-full text-center"
               style={{ padding: 20 }}
             >
               [ DEPLOY ARCHITECTURE &amp; LOCK SLOT ]
-            </button>
+            </a>
           </div>
-
-          {/* DEPLOY REVEAL — mounted only after click */}
-          <AnimatePresence>
-            {opened && (
-              <motion.div
-                className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-6 px-10 text-center"
-                style={{ background: "#1a1a1e", color: "#fff" }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.2 }}
-              >
-                <RecomposeLogo />
-                <motion.div
-                  className="mono flex flex-col items-center"
-                  style={{ color: "rgba(255,255,255,0.85)" }}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.7, duration: 0.4 }}
-                >
-                  <p
-                    style={{
-                      fontSize: 11,
-                      letterSpacing: "0.22em",
-                      color: "#c41e0e",
-                    }}
-                  >
-                    {"// ARCHITECTURE LOCKED"}
-                  </p>
-                  <p
-                    style={{
-                      fontSize: 11,
-                      letterSpacing: "0.18em",
-                      color: "rgba(255,255,255,0.4)",
-                      marginTop: 18,
-                    }}
-                  >
-                    YOUR BRIEF
-                  </p>
-                  <p style={{ fontSize: 15, marginTop: 8 }}>
-                    {stage} · {vertical} · {slider}% focus
-                  </p>
-                  <p style={{ fontSize: 15, marginTop: 6 }}>
-                    Estimated: {result.value}
-                  </p>
-                  <p
-                    style={{
-                      fontSize: 13,
-                      color: "rgba(255,255,255,0.55)",
-                      marginTop: 18,
-                    }}
-                  >
-                    We&apos;ll reach out within 4 hours.
-                  </p>
-                  <a
-                    href="mailto:hello@mizarcore.studio"
-                    className="btn-dark btn-deploy"
-                    style={{
-                      marginTop: 18,
-                      padding: "12px 22px",
-                      background: "transparent",
-                      border: "1px solid #c41e0e",
-                      color: "#fff",
-                    }}
-                  >
-                    [ hello@mizarcore.studio ]
-                  </a>
-                </motion.div>
-
-                {/* split doors slide apart over the dark reveal */}
-                <motion.div
-                  className="pointer-events-none absolute inset-y-0 left-0"
-                  style={{ width: "50%", background: "#ffffff" }}
-                  initial={{ x: "0%" }}
-                  animate={{ x: "-100%" }}
-                  transition={{ duration: 0.45, ease: EASE, delay: 0.05 }}
-                />
-                <motion.div
-                  className="pointer-events-none absolute inset-y-0 right-0"
-                  style={{
-                    width: "50%",
-                    background: "#ffffff",
-                    borderLeft: "1px solid #e4e4e7",
-                  }}
-                  initial={{ x: "0%" }}
-                  animate={{ x: "100%" }}
-                  transition={{ duration: 0.45, ease: EASE, delay: 0.05 }}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
       </div>
     </section>

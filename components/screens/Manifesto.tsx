@@ -147,9 +147,9 @@ export function Manifesto() {
               lineHeight: 1.5,
             }}
           >
-            Your product is ready.
+            We build sites that close deals.
             <br />
-            Your site isn&apos;t.
+            Strategy included. Live in 2–5 days.
           </span>
         </motion.p>
 

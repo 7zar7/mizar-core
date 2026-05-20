@@ -6,8 +6,6 @@ import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { Manifesto } from "@/components/screens/Manifesto";
 import { Signal } from "@/components/screens/Signal";
-import { ValueProps } from "@/components/screens/ValueProps";
-import { ProcessVideo } from "@/components/screens/ProcessVideo";
 import { Evidence } from "@/components/screens/Evidence";
 import { Configurator } from "@/components/screens/Configurator";
 import { Close } from "@/components/screens/Close";
@@ -23,8 +21,6 @@ export default function Home() {
       <main className="relative">
         <Manifesto />
         <Signal />
-        <ValueProps />
-        <ProcessVideo />
         <Evidence />
         <Configurator />
         <Close />
